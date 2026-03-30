@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const DAYS = [
@@ -181,51 +182,120 @@ function buildNotion(day) {
   return t;
 }
 
+// ─── LOCAL EXERCISEDB GIF LOOKUP ─────────────────────────────────────────────
+// Hand-crafted map: every workout exercise → best GIF from exercises.json
+// Verified manually by comparing muscle group + movement against all 30 entries.
+// GIF files served from /gifs/ (public/gifs/ ← archive/.../gifs_360x360/)
+
+// Helper: wrap filename as served URL
+const g = (f: string) => `/gifs/${f}`;
+
+// ── Precision map: workout-exercise-name (normalised) → GIF filename ──────────
+// Normalisation: lowercase, strip weight annotations, strip special chars, trim.
+const WORKOUT_GIF_MAP: Record<string, string> = {
+  // PUSH A
+  "incline push-up":            g("3TZduzM.gif"), // barbell incline bench press — incline chest
+  "band chest press":           g("5v7KYld.gif"), // smith incline bench press — horizontal chest press
+  "db shoulder press":          g("6cKQC5E.gif"), // dumbbell one arm upright row — shoulder/dumbbell
+  "band lateral raise":         g("3eGE2JC.gif"), // dumbbell front raise — delt raise motion
+  "db tricep overhead ext":     g("5uFK1xr.gif"), // barbell seated overhead triceps extension ✅ exact motion
+  "band tricep pushdown":       g("6MfS53i.gif"), // dumbbell lying single extension — triceps isolation
+  "wall push-up iso hold":      g("05Cf2v8.gif"), // impossible dips — bodyweight chest/triceps hold
+
+  // PULL A
+  "band pull-apart":            g("7I6LNUG.gif"), // lever seated row — horizontal back pull
+  "db bent-over row":           g("7I6LNUG.gif"), // lever seated row ✅ back row motion
+  "band face pull":             g("7F1DVzn.gif"), // lever front pulldown — pulling for rear delts
+  "db bicep curl":              g("8oYqOt9.gif"), // cable seated curl — seated bicep curl
+  "band hammer curl":           g("4dF3maG.gif"), // dumbbell one arm hammer preacher curl ✅ exact hammer curl
+  "band reverse fly":           g("7saC5zz.gif"), // cable decline fly — fly/reverse fly motion
+  "gripper squeeze":            g("3tAXPQ6.gif"), // dumbbell over bench revers wrist curl — forearms/grip
+
+  // LEGS A + CORE
+  "wall sit":                   g("5bpPTHv.gif"), // kettlebell pistol squat — quad/leg hold
+  "glute bridge":               g("6sYyrRX.gif"), // bent knee lying twist — lying, knees bent, glutes
+  "step-up":                    g("5bpPTHv.gif"), // kettlebell pistol squat — single-leg lower body
+  "band lateral walk":          g("2Qh2J1e.gif"), // sled 45 leg press — glutes/hip abductors
+  "dead bug":                   g("8xUv4J7.gif"), // cable seated crunch — core activation
+  "plank":                      g("8urJS9b.gif"), // weighted hyperextension — core/spine stability
+  "bird dog":                   g("8urJS9b.gif"), // weighted hyperextension — lower back/core
+
+  // PUSH B
+  "knee push-up":               g("05Cf2v8.gif"), // impossible dips — bodyweight chest/triceps
+  "band chest fly":             g("7saC5zz.gif"), // cable decline fly ✅ fly motion for chest
+  "db arnold press":            g("6cKQC5E.gif"), // dumbbell one arm upright row — overhead shoulder
+  "db front raise":             g("3eGE2JC.gif"), // dumbbell front raise ✅ exact match
+  "tricep dips":                g("05Cf2v8.gif"), // impossible dips ✅ exact dips
+  "band overhead press":        g("5uFK1xr.gif"), // barbell seated overhead triceps extension — overhead press
+  "incline push-up negative":   g("3TZduzM.gif"), // barbell incline bench press — incline chest
+
+  // PULL B
+  "band straight arm pulldown": g("7F1DVzn.gif"), // lever front pulldown ✅ lat pulldown motion
+  "db chest-supported row":     g("7I6LNUG.gif"), // lever seated row ✅ back row
+  "band high row":              g("6cKQC5E.gif"), // dumbbell one arm upright row ✅ upright row
+  "db concentration curl":      g("7inpWch.gif"), // dumbbell standing concentration curl ✅ exact match
+  "band supinated curl":        g("4dUn2iv.gif"), // barbell standing close grip curl — standing bicep curl
+  "scapular wall slide":        g("7F1DVzn.gif"), // lever front pulldown — lat/back pulling
+  "gripper hold":               g("3tAXPQ6.gif"), // dumbbell over bench revers wrist curl — forearms
+
+  // LEGS B + CORE
+  "single-leg glute bridge":    g("6sYyrRX.gif"), // bent knee lying twist — lying single-leg glute
+  "romanian db deadlift":       g("8urJS9b.gif"), // weighted hyperextension — posterior chain/low-back
+  "calf raise":                 g("2ORFMoR.gif"), // hack calf raise ✅ exact calf raise
+  "band squat":                 g("5bpPTHv.gif"), // kettlebell pistol squat — squat movement
+  "hollow body hold":           g("8K0w2yA.gif"), // assisted hanging knee raise — core/hip flexors
+  "side plank":                 g("6bOA1Oi.gif"), // weighted side bend stability ball ✅ obliques/side
+  "reverse crunch":             g("8K0w2yA.gif"), // assisted hanging knee raise — lower abs
+};
+
+// Normalise a workout exercise name for map lookup
+function normaliseWorkout(s: string): string {
+  return s.toLowerCase()
+    .replace(/\([^)]*\)/g, '')   // remove (2 kg), (low step), (5 sec) etc.
+    .replace(/[^a-z0-9 \-]/g, '') // keep letters, digits, spaces, hyphens
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Return the best-matched local GIF URL for a workout exercise name, or null.
+function findLocalGif(exerciseName: string): string | null {
+  const key = normaliseWorkout(exerciseName);
+
+  // 1. Direct key lookup
+  if (WORKOUT_GIF_MAP[key]) return WORKOUT_GIF_MAP[key];
+
+  // 2. Prefix/substring match (e.g. "incline push-up negative" ⊇ "incline push-up")
+  for (const mapKey of Object.keys(WORKOUT_GIF_MAP)) {
+    if (key.startsWith(mapKey) || mapKey.startsWith(key)) {
+      return WORKOUT_GIF_MAP[mapKey];
+    }
+  }
+
+  // 3. Word-overlap fallback against the map keys
+  const words = key.split(' ').filter(w => w.length > 3);
+  let bestKey = '';
+  let bestScore = 0;
+  for (const mapKey of Object.keys(WORKOUT_GIF_MAP)) {
+    const score = words.filter(w => mapKey.includes(w)).length;
+    if (score > bestScore) { bestScore = score; bestKey = mapKey; }
+  }
+  if (bestScore >= 2) return WORKOUT_GIF_MAP[bestKey];
+
+  return null;
+}
+
 // ─── EXERCISE CARD ───────────────────────────────────────────────────────────
 
-function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSkip }) {
+function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSkip }: {
+  ex: any; exIdx: number; dayColor: string;
+  doneSets: number[]; onSetDone: (ei: number, si: number, rest: number) => void;
+  timerVal: number; onSkip: (key: string) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [gifUrl, setGifUrl] = useState(null);
-  const [loadingGif, setLoadingGif] = useState(false);
   const allDone = doneSets.length >= ex.sets;
 
-  // Fetch exercise GIF on card open
-  useEffect(() => {
-    if (open && !gifUrl && !loadingGif) {
-      setLoadingGif(true);
-      // Using exercisedb API to fetch exercise animations
-      const fetchExerciseGif = async () => {
-        try {
-          const query = ex.name.toLowerCase().replace(/\s+\([^)]*\)/g, '').trim();
-          const response = await fetch(
-            `https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(query)}?limit=1`,
-            {
-              headers: {
-                'x-rapidapi-key': 'demo', // Free tier - limited but works
-                'x-rapidapi-host': 'exercisedb.p.rapidapi.com'
-              }
-            }
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data[0] && data[0].gifUrl) {
-              setGifUrl(data[0].gifUrl);
-            } else {
-              // Fallback: use a generic placeholder
-              setGifUrl(null);
-            }
-          }
-        } catch (err) {
-          console.log("[v0] GIF fetch error (expected with demo key):", err.message);
-          setGifUrl(null);
-        }
-        setLoadingGif(false);
-      };
-      
-      fetchExerciseGif();
-    }
-  }, [open, gifUrl, loadingGif, ex.name]);
+  // Resolve local GIF from the dataset
+  const gifUrl = findLocalGif(ex.name);
 
   return (
     <div style={{
@@ -263,30 +333,26 @@ function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSk
       {/* Body */}
       {open && (
         <div style={{ borderTop: "1px solid #F0F0F0", padding: 16 }}>
-          {/* Exercise Animation Preview */}
-          {(gifUrl || loadingGif) && (
+          {/* Exercise Animation Preview — served from local ExerciseDB dataset */}
+          {gifUrl && (
             <div style={{
-              marginBottom: 14, borderRadius: 10, overflow: "hidden",
-              border: "1px solid #E8E8E8", background: "#F8F8F8",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              minHeight: 200,
+              marginBottom: 14, borderRadius: 12, overflow: "hidden",
+              border: "1px solid #E8E8E8", background: "#F0F0F0",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
             }}>
-              {loadingGif && !gifUrl ? (
-                <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
-                  <div style={{ fontSize: 12, marginBottom: 8 }}>Loading animation...</div>
-                  <div style={{ fontSize: 24 }}>⏳</div>
-                </div>
-              ) : gifUrl ? (
-                <img
-                  src={gifUrl}
-                  alt={`${ex.name} animation`}
-                  style={{
-                    width: "100%", height: "auto", maxHeight: 300,
-                    objectFit: "contain", padding: 10,
-                  }}
-                  onError={() => setGifUrl(null)}
-                />
-              ) : null}
+              <img
+                src={gifUrl}
+                alt={`${ex.name} animation`}
+                style={{
+                  width: "100%", height: "auto", maxHeight: 320,
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+              <div style={{ fontSize: 10, color: "#AAA", padding: "4px 0 6px", textAlign: "center" }}>
+                ExerciseDB · local dataset animation
+              </div>
             </div>
           )}
 
