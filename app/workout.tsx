@@ -185,7 +185,47 @@ function buildNotion(day) {
 
 function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSkip }) {
   const [open, setOpen] = useState(false);
+  const [gifUrl, setGifUrl] = useState(null);
+  const [loadingGif, setLoadingGif] = useState(false);
   const allDone = doneSets.length >= ex.sets;
+
+  // Fetch exercise GIF on card open
+  useEffect(() => {
+    if (open && !gifUrl && !loadingGif) {
+      setLoadingGif(true);
+      // Using exercisedb API to fetch exercise animations
+      const fetchExerciseGif = async () => {
+        try {
+          const query = ex.name.toLowerCase().replace(/\s+\([^)]*\)/g, '').trim();
+          const response = await fetch(
+            `https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(query)}?limit=1`,
+            {
+              headers: {
+                'x-rapidapi-key': 'demo', // Free tier - limited but works
+                'x-rapidapi-host': 'exercisedb.p.rapidapi.com'
+              }
+            }
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data[0] && data[0].gifUrl) {
+              setGifUrl(data[0].gifUrl);
+            } else {
+              // Fallback: use a generic placeholder
+              setGifUrl(null);
+            }
+          }
+        } catch (err) {
+          console.log("[v0] GIF fetch error (expected with demo key):", err.message);
+          setGifUrl(null);
+        }
+        setLoadingGif(false);
+      };
+      
+      fetchExerciseGif();
+    }
+  }, [open, gifUrl, loadingGif, ex.name]);
 
   return (
     <div style={{
@@ -223,6 +263,33 @@ function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSk
       {/* Body */}
       {open && (
         <div style={{ borderTop: "1px solid #F0F0F0", padding: 16 }}>
+          {/* Exercise Animation Preview */}
+          {(gifUrl || loadingGif) && (
+            <div style={{
+              marginBottom: 14, borderRadius: 10, overflow: "hidden",
+              border: "1px solid #E8E8E8", background: "#F8F8F8",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              minHeight: 200,
+            }}>
+              {loadingGif && !gifUrl ? (
+                <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
+                  <div style={{ fontSize: 12, marginBottom: 8 }}>Loading animation...</div>
+                  <div style={{ fontSize: 24 }}>⏳</div>
+                </div>
+              ) : gifUrl ? (
+                <img
+                  src={gifUrl}
+                  alt={`${ex.name} animation`}
+                  style={{
+                    width: "100%", height: "auto", maxHeight: 300,
+                    objectFit: "contain", padding: 10,
+                  }}
+                  onError={() => setGifUrl(null)}
+                />
+              ) : null}
+            </div>
+          )}
+
           {/* Exercise Guide Link */}
           <a
             href={ex.link}
