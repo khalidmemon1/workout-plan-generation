@@ -11,16 +11,16 @@ const DAYS = [
     type: "Push A",
     color: "#6C63FF",
     bg: "#EEF",
-    sub: "Chest · Shoulders · Triceps",
-    phases: ["5 min warm-up", "30 min strength", "15 min hypertrophy", "10 min cool-down"],
+    sub: "Chest · Triceps · Shoulders (secondary)",
+    phases: ["5 min warm-up", "35 min strength", "10 min cool-down + neck"],
     exercises: [
-      { name: "Incline Push-up", sets: 4, reps: "8–12", rest: 60, muscles: "Chest, Triceps, Shoulders", note: "Hands on table/chair. Keep body rigid and straight. Lower chest to surface slowly — 3 sec down, 1 sec up.", tip: "Wrist tip: Keep wrists neutral. If wrists ache, make fists on a mat instead of flat palm.", link: "https://www.muscleandstrength.com/exercises/incline-push-up.html" },
-      { name: "Band Chest Press", sets: 3, reps: "12–15", rest: 60, muscles: "Chest, Triceps", note: "Anchor band at chest height behind you. Press forward with arms parallel to floor. Squeeze chest at full extension.", tip: "Control the return — do not let the band snap your arms back.", link: "https://www.muscleandstrength.com/exercises/resistance-band-chest-press.html" },
-      { name: "DB Shoulder Press (2 kg)", sets: 3, reps: "12", rest: 60, muscles: "Shoulders, Triceps", note: "Seated or standing. Press dumbbells overhead, stop just before elbows fully lock out.", tip: "Do not shrug shoulders up to your ears. Keep neck long throughout.", link: "https://www.muscleandstrength.com/exercises/seated-dumbbell-press.html" },
-      { name: "Band Lateral Raise", sets: 3, reps: "15", rest: 45, muscles: "Lateral deltoid", note: "Step on band centre, hold each end. Raise arms out to shoulder height only — no higher.", tip: "Slight bend in elbow throughout. Do not swing your body for momentum.", link: "https://www.muscleandstrength.com/exercises/band-lateral-raise.html" },
-      { name: "DB Tricep Overhead Ext. (2 kg)", sets: 3, reps: "12", rest: 60, muscles: "Triceps", note: "Both hands on one dumbbell overhead. Lower behind head slowly, elbows pointing forward. Press back up.", tip: "Keep elbows close to your ears — do not flare them out.", link: "https://www.muscleandstrength.com/exercises/dumbbell-overhead-tricep-extension.html" },
-      { name: "Band Tricep Pushdown", sets: 3, reps: "15", rest: 45, muscles: "Triceps", note: "Anchor band high. Keeping elbows tucked at sides, push hands down until arms are straight.", tip: "Squeeze triceps hard at the bottom. Controlled return — resist the band on the way up.", link: "https://www.muscleandstrength.com/exercises/resistance-band-tricep-pushdown.html" },
-      { name: "Wall Push-up Iso Hold", sets: 3, reps: "20 sec", rest: 45, muscles: "Chest, Triceps", note: "Press hands on wall, lower yourself halfway, hold that position. Builds strength for floor push-ups.", tip: "This is your finisher — push hard. It is harder than it looks. Breathe steadily.", link: "https://www.muscleandstrength.com/exercises/wall-pushup.html" },
+      { name: "Push-up Progression Set", sets: 4, reps: "3–5 floor → knee to 12", rest: 90, muscles: "Chest, Triceps, Shoulders", note: "Start each set with 3–5 full floor push-ups. When form breaks (hips sag, chest not reaching floor), drop immediately to knee push-ups and finish to 12 total reps. Hands slightly wider than shoulder-width, elbows 45° angle. 3 seconds down, 1 second up.", tip: "Count your floor reps every Monday and write them down. That number going from 3→4→5 over weeks IS your progress. When you hit 8 clean floor reps before dropping, graduate to full push-ups only.", link: "https://www.muscleandstrength.com/exercises/push-up.html" },
+      { name: "DB Floor Chest Press (5 kg)", sets: 4, reps: "10–12", rest: 75, muscles: "Chest, Front delts, Triceps", note: "Lie on mat, knees bent, feet flat. Hold 5 kg DB in each hand at chest level, elbows at 45° angle. Press up until arms nearly straight. Lower slowly over 3 seconds until elbows lightly touch the mat — controlled touch, no bounce.", tip: "If 5 kg feels too heavy for clean reps, start with 3 kg. Ego lifts build nothing. 3 kg pressed perfectly beats 5 kg slammed around.", link: "https://www.muscleandstrength.com/exercises/dumbbell-floor-press.html" },
+      { name: "Band Chest Fly", sets: 3, reps: "12–15", rest: 60, muscles: "Inner chest, Front delts", note: "Anchor band at chest height behind you. Step forward for tension. Arms slightly bent (soft elbow — never lock). Sweep both hands forward and together like hugging a tree. Squeeze chest 1 second at front. Return slowly over 3 seconds.", tip: "Do not let the band snap your arms back. The 3-second return is the work. If you cannot control it, step closer to reduce tension.", link: "https://www.muscleandstrength.com/exercises/resistance-band-chest-fly.html" },
+      { name: "Tricep Dips — Chair", sets: 3, reps: "10–12", rest: 75, muscles: "Triceps, Lower chest", note: "Hands on stable chair edge, fingers forward. Feet flat on floor. Lower until elbows reach exactly 90° — not deeper. Press back up, stop 10° before lockout. Back stays close to chair. 3 seconds down, 1 second up.", tip: "If your wrists hurt with flat palms, make soft fists on the chair edge instead. The slow descent is where tricep tension lives.", link: "https://www.muscleandstrength.com/exercises/bench-dip.html" },
+      { name: "DB Tricep Overhead Extension (3 kg)", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Sit or stand. Hold one 3 kg DB with both hands (diamond grip). Raise overhead. Elbows point forward, pinned next to ears. Lower DB behind head until deep stretch in back of arm. Press back up. 3 seconds down, 1 second up.", tip: "If elbows flare outward at any point, the weight is too heavy — the flare is a tell. The long head only gets fully stretched overhead.", link: "https://www.muscleandstrength.com/exercises/dumbbell-overhead-tricep-extension.html" },
+      { name: "Band Tricep Pushdown", sets: 3, reps: "15", rest: 45, muscles: "All three tricep heads", note: "Anchor band high (door frame). Upper arms pinned to sides — they do not move. Only forearms move. Push hands down until arms fully straight. Squeeze triceps 1 second. Return slowly, stop when forearms parallel to floor.", tip: "This is your isolation finisher — the triceps are already pumped. The band allows you to squeeze reps without joint stress. Resist the band on the way up.", link: "https://www.muscleandstrength.com/exercises/resistance-band-tricep-pushdown.html" },
+      { name: "DB Pullover (5 kg) — FAT ZONE", sets: 3, reps: "12", rest: 60, muscles: "Chest, Serratus anterior, Lats", note: "Lie on mat. Hold one 5 kg DB with both hands, palms flat against inner plate. Press above chest. Keeping slight elbow bend, lower DB back behind head toward floor. Feel chest and rib cage stretch. Pull back over chest. 3 seconds each direction.", tip: "Do not go lower than comfortable shoulder range. The stretch should feel good — stop if it feels like a strain. This builds the serratus that creates chest definition.", link: "https://www.muscleandstrength.com/exercises/dumbbell-pullover.html" },
     ],
   },
   {
@@ -29,34 +29,34 @@ const DAYS = [
     type: "Pull A",
     color: "#0DBD8B",
     bg: "#E1F5EE",
-    sub: "Back · Biceps · Rear delts",
-    phases: ["5 min warm-up", "30 min strength", "15 min hypertrophy", "10 min cool-down"],
+    sub: "Rear Delts FIRST → Back → Biceps",
+    phases: ["5 min warm-up", "35 min pull", "10 min cool-down"],
     exercises: [
-      { name: "Band Pull-apart", sets: 4, reps: "15–20", rest: 45, muscles: "Rear delts, Rhomboids", note: "Hold band at shoulder width with straight arms. Pull wide until band touches your chest. Squeeze shoulder blades together.", tip: "Slow and controlled — this is posture-fixing gold. Do not rush it.", link: "https://www.muscleandstrength.com/exercises/band-pull-apart.html" },
-      { name: "DB Bent-over Row (5 kg)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Rhomboids, Biceps", note: "Support one hand on chair. Hinge at hip, keep back completely flat. Row elbow toward ceiling — not out to the side.", tip: "Lower back note: Keep spine neutral. No rounding. Stop if you feel any twinge.", link: "https://www.muscleandstrength.com/exercises/one-arm-dumbbell-row.html" },
-      { name: "Band Face Pull", sets: 3, reps: "15", rest: 60, muscles: "Rear delts, Rotator cuff", note: "Anchor band at face height. Pull toward forehead with elbows flaring high and wide.", tip: "This fixes posture and builds the pull-up foundation. Do not skip it — it is one of the most important exercises for you.", link: "https://www.muscleandstrength.com/exercises/band-face-pull.html" },
-      { name: "DB Bicep Curl (3 kg)", sets: 3, reps: "12", rest: 60, muscles: "Biceps", note: "Palms facing up. Curl to shoulder. 2 sec up, 3 sec down. No body swing whatsoever.", tip: "Slow negatives (lowering) build more muscle than fast reps. The descent is where the work happens.", link: "https://www.muscleandstrength.com/exercises/dumbbell-bicep-curl.html" },
-      { name: "Band Hammer Curl", sets: 3, reps: "15", rest: 45, muscles: "Biceps, Brachialis", note: "Step on band. Palms facing each other the entire movement. Curl up to shoulder height.", tip: "Hits the brachialis muscle which makes arms look thicker from the front — do not skip this.", link: "https://www.muscleandstrength.com/exercises/resistance-band-hammer-curl.html" },
-      { name: "Band Reverse Fly", sets: 3, reps: "15", rest: 45, muscles: "Rear deltoid", note: "Hinge forward 45°. Hold band in front, raise arms out wide like wings. Squeeze at the top.", tip: "Lighter resistance here is better — the squeeze at the top is what matters, not the weight.", link: "https://www.muscleandstrength.com/exercises/band-reverse-fly.html" },
-      { name: "Gripper Squeeze", sets: 3, reps: "10 each hand", rest: 30, muscles: "Forearms, Grip", note: "Squeeze gripper fully. Hold 3 seconds. Release slowly. Builds forearm thickness and grip strength.", tip: "Both hands benefit even when only one is squeezing — there is a neural crossover effect.", link: "https://www.muscleandstrength.com/exercises/hand-grip-strengthener.html" },
+      { name: "Band Face Pull (4-sec tempo)", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rotator cuff, Middle traps", note: "Anchor band at face height. Thumbs-up grip. Pull hands toward face — elbows travel HIGH and WIDE. At peak, hands beside ears, elbows flared like wings. Hold 1 second. Return over 3 seconds. Tempo: 1 sec pull, 1 sec hold, 3 sec return.", tip: "This is first because rear delts fatigue fast. Training them fresh ensures quality work. They also warm up the shoulder joint for everything that follows.", link: "https://www.muscleandstrength.com/exercises/band-face-pull.html" },
+      { name: "Band Pull-Apart (2-sec squeeze)", sets: 3, reps: "20", rest: 45, muscles: "Rear delts, Rhomboids, Middle traps", note: "Hold band at shoulder width, arms straight out front. Pull apart until band touches chest — keep arms completely straight throughout. At full stretch, squeeze shoulder blades together and hold 2 full seconds. Return slowly.", tip: "The 2-second squeeze at the back contracts your rhomboids maximally. This is a posture-correcting exercise — it directly fixes rounded shoulders from hunched neck.", link: "https://www.muscleandstrength.com/exercises/band-pull-apart.html" },
+      { name: "DB Bent-over Row (5 kg)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Rhomboids, Biceps", note: "One hand on chair for support. Hinge at hip — torso nearly parallel to floor. Hold DB in free hand, arm hanging straight. Row elbow straight up toward ceiling. At top, elbow higher than back. Squeeze lat 1 second. Lower over 3 seconds.", tip: "Think 'elbow to ceiling' not 'hand to hip.' The elbow direction determines which muscle works. If your back rounds, the weight is too heavy — use 3 kg.", link: "https://www.muscleandstrength.com/exercises/one-arm-dumbbell-row.html" },
+      { name: "Band Straight-Arm Pulldown", sets: 3, reps: "15", rest: 60, muscles: "Lats, Serratus", note: "Anchor band high (above head). Hold one end in each hand, arms straight. Keeping arms straight the entire movement, pull both hands down to hips by squeezing lats. Imagine pinching a pencil in your armpits. Return slowly overhead.", tip: "When arms are straight, biceps cannot help — only lats pull. This is pure lat isolation. Resist the band on the way up.", link: "https://www.muscleandstrength.com/exercises/band-lat-pulldown.html" },
+      { name: "DB Bicep Curl (5 kg) — Slow Negative", sets: 3, reps: "10–12", rest: 75, muscles: "Biceps", note: "Stand tall. Hold 5 kg DB in each hand, palms up. Curl both together — 2 seconds up. At top, squeeze 1 second. Lower over 3 full seconds — this slow lowering is where the muscle grows. Zero body swing.", tip: "The 5 kg will feel significantly heavier than 3 kg. If you cannot do 8 reps with zero swing, do 3 kg for one more week then retry. Rocking your back means the weight is too heavy.", link: "https://www.muscleandstrength.com/exercises/dumbbell-bicep-curl.html" },
+      { name: "Band Hammer Curl", sets: 3, reps: "15", rest: 45, muscles: "Brachialis, Biceps, Forearm", note: "Step on band centre. Hold both ends with palms facing each other (thumbs-up grip — must not change throughout). Curl to shoulder height. 2 seconds up, 3 seconds down. Elbows pinned at sides.", tip: "The brachialis sits under the bicep. When developed, it pushes the bicep up and makes your arm look thicker from the front. Standard curls barely touch it — hammer curls hit it directly.", link: "https://www.muscleandstrength.com/exercises/resistance-band-hammer-curl.html" },
+      { name: "Band Woodchop (FAT ZONE)", sets: 3, reps: "12 each side", rest: 45, muscles: "Obliques, Rotational core", note: "Anchor band HIGH. Stand sideways to anchor. Hold both ends with hands clasped. In one smooth rotation, pull band diagonally downward across body — from high anchor side to low opposite hip. Feet planted; rotation in torso. Return slowly with control.", tip: "The power comes from your torso rotation — not your arms. Arms just hold the band. Think of your belly button rotating toward the anchor. Slow return = more oblique work.", link: "https://www.muscleandstrength.com/exercises/cable-wood-chop.html" },
     ],
   },
   {
     key: "wed",
     label: "Wednesday",
-    type: "Legs A + Core",
+    type: "Legs A",
     color: "#FF6B35",
     bg: "#FAECE7",
-    sub: "Quads · Glutes · Hamstrings · Core",
-    phases: ["8 min warm-up + knee prep", "25 min leg work", "15 min core", "12 min cool-down & mobility"],
+    sub: "Quads · VMO · Knee Strengthening",
+    phases: ["8 min warm-up + knee prep", "30 min legs", "10 min cool-down"],
     exercises: [
-      { name: "Wall Sit", sets: 4, reps: "30–45 sec", rest: 60, muscles: "Quads, VMO", note: "Back flat on wall, thighs parallel to floor. STOP 10–15° before your knees fully extend — never lock out.", tip: "Knee safety: This is the #1 exercise for your knee issue. VMO (inner quad) directly stabilises hyperextending knees.", link: "https://www.muscleandstrength.com/exercises/wall-sit.html" },
-      { name: "Glute Bridge", sets: 4, reps: "15", rest: 60, muscles: "Glutes, Hamstrings", note: "Feet flat, hip-width apart. Drive hips up, squeeze glutes hard at the top. Hold 1 second. Lower slowly.", tip: "Strong glutes support the knee from behind and are essential for running endurance. These two goals align perfectly.", link: "https://www.muscleandstrength.com/exercises/glute-bridge.html" },
-      { name: "Step-up (Low Step)", sets: 3, reps: "10 each leg", rest: 60, muscles: "Quads, Glutes", note: "Use a stable low step or thick book stack. Step up slowly. Control the descent — do not drop down.", tip: "Knee safety: Keep knee tracking in line with your toes. Do not let it cave inward.", link: "https://www.muscleandstrength.com/exercises/step-up.html" },
-      { name: "Band Lateral Walk", sets: 3, reps: "15 each way", rest: 45, muscles: "Hip abductors, Glutes", note: "Band above knees. Slight squat position throughout. Take small controlled steps sideways — do not let feet come together.", tip: "Directly strengthens hip abductors which correct both knee caving and knee hyperextension. Very important for you.", link: "https://www.muscleandstrength.com/exercises/resistance-band-lateral-walk.html" },
-      { name: "Dead Bug", sets: 3, reps: "10 each side", rest: 45, muscles: "Core, Transverse abdominis", note: "Lie on back, arms pointing up, knees at 90°. Lower opposite arm and leg simultaneously while pressing lower back INTO the floor.", tip: "Lower back note: If your lower back lifts off the floor, reduce your range of motion. Quality beats depth every time.", link: "https://www.muscleandstrength.com/exercises/dead-bug.html" },
-      { name: "Plank", sets: 3, reps: "30–45 sec", rest: 45, muscles: "Core, Glutes, Shoulders", note: "Elbows directly under shoulders. Neutral spine — hips level with shoulders, not raised or dropped.", tip: "Squeeze glutes AND quads during the hold. That is what makes it genuinely hard and effective.", link: "https://www.muscleandstrength.com/exercises/plank.html" },
-      { name: "Bird Dog", sets: 3, reps: "10 each side", rest: 45, muscles: "Core, Lower back, Glutes", note: "On all fours. Extend opposite arm and leg slowly. Hold 2 seconds. Return without letting them touch the floor.", tip: "Lower back note: This directly rehabilitates lower back weakness. Do not rush — slow and controlled is the goal.", link: "https://www.muscleandstrength.com/exercises/bird-dog.html" },
+      { name: "Terminal Knee Extension — Band (KNEE FIX)", sets: 3, reps: "15 each leg", rest: 30, muscles: "VMO, Knee stabilisers", note: "Anchor band at knee height behind you. Loop around back of one knee. Stand on that leg, slight bend. Straighten knee against band resistance — STOP 5–10° before fully straight. Hold 1 second. Return to bent.", tip: "You will barely feel this initially — that is normal. It is neuromuscular activation work, not burn work. Over weeks you will feel it clearly. Do this before every leg session.", link: "https://www.muscleandstrength.com/exercises/terminal-knee-extension.html" },
+      { name: "Wall Sit with 5 kg DB", sets: 4, reps: "45–60 sec", rest: 75, muscles: "VMO, Quads, Glutes", note: "Back completely flat on wall. Thighs parallel to floor. Hold one 5 kg DB on each thigh. CRITICAL: Stop 10–15° before knees fully extend — never lock out. VMO under continuous tension the entire hold.", tip: "When 60 seconds feels comfortable, add the second 5 kg dumbbell across both legs (10 kg total). The partial stop protects hyperextending knees.", link: "https://www.muscleandstrength.com/exercises/wall-sit.html" },
+      { name: "Single-leg Glute Bridge", sets: 4, reps: "12 each leg", rest: 60, muscles: "Glutes, Hamstrings, Hip stabilisers", note: "Lie on mat. One leg bent with foot flat, other leg extended straight or raised to 45°. Drive hips up using only bent leg — squeeze glutes maximally at top for 1 second. Lower slowly over 2 seconds. Complete all 12 on one leg before switching.", tip: "Single-leg reveals and corrects left/right imbalances. Imbalances in glute strength are a direct cause of knee tracking problems on longer walks.", link: "https://www.muscleandstrength.com/exercises/single-leg-glute-bridge.html" },
+      { name: "Band Lateral Walk", sets: 3, reps: "20 steps each direction", rest: 45, muscles: "Hip abductors, Glute medius", note: "Band just above knees. Slight squat position — maintain it the entire time. Take controlled steps sideways. Do not let feet come together between steps. Keep constant tension. 20 steps right, 20 steps left = 1 set.", tip: "Weak hip abductors cause knees to cave inward during walking. When they fatigue at high step counts, tracking worsens. This directly builds the muscle that keeps knees aligned.", link: "https://www.muscleandstrength.com/exercises/resistance-band-lateral-walk.html" },
+      { name: "Step-up with 5 kg DB", sets: 3, reps: "10 each leg", rest: 75, muscles: "Quads, Glutes", note: "Hold one 5 kg DB on same side as working leg. Use stable low step (15–20 cm). Step up pressing through entire foot — not just toes. At top, straighten leg but STOP before locking knee. Lower opposite foot slowly over 3 seconds.", tip: "Track your knee directly over your 2nd and 3rd toe throughout. If it caves inward, reduce the DB weight or step height.", link: "https://www.muscleandstrength.com/exercises/dumbbell-step-up.html" },
+      { name: "Pallof Press — Band (FAT ZONE)", sets: 3, reps: "12 each side", rest: 45, muscles: "Deep core, Transverse abdominis, Obliques", note: "Anchor band at chest height. Stand sideways to anchor. Hold band at chest with both hands. Press both arms straight out — fully extended. Hold 2 seconds. Return to chest. The challenge is preventing your body from rotating toward the band.", tip: "The Pallof press works the deep transverse abdominis — the natural corset around your waist. Use enough tension that you have to work to stay still. Too light = easy to cheat.", link: "https://www.muscleandstrength.com/exercises/pallof-press.html" },
+      { name: "Calf Raise — Two-leg on Step", sets: 3, reps: "20", rest: 45, muscles: "Gastrocnemius, Soleus", note: "Stand on edge of step, heels hanging. Lower heels completely below step level — full stretch. Rise onto toes — full contraction. 2 seconds up, 2 seconds down. No bouncing. Feel both full stretch at bottom and full squeeze at top.", tip: "Strong calves absorb ground impact during walking. Building them reduces the load transmitted up to the knee on every step.", link: "https://www.muscleandstrength.com/exercises/standing-calf-raise.html" },
     ],
   },
   {
@@ -65,16 +65,16 @@ const DAYS = [
     type: "Push B",
     color: "#6C63FF",
     bg: "#EEEDFE",
-    sub: "Chest · Shoulders · Triceps — variation",
-    phases: ["5 min warm-up", "30 min strength", "15 min hypertrophy", "10 min cool-down"],
+    sub: "Shoulders FIRST · Chest · Triceps",
+    phases: ["5 min warm-up", "35 min push", "10 min cool-down + neck"],
     exercises: [
-      { name: "Knee Push-up", sets: 4, reps: "Max reps", rest: 60, muscles: "Chest, Triceps, Shoulders", note: "Knees on floor, body straight from knee to head. Lower chest to floor, press back up. Track your max reps weekly.", tip: "When you hit 15+ knee push-ups consistently, try transitioning to floor push-ups. Progress is the goal.", link: "https://www.muscleandstrength.com/exercises/knee-push-up.html" },
-      { name: "Band Chest Fly", sets: 3, reps: "12–15", rest: 60, muscles: "Chest (inner)", note: "Anchor bands at shoulder height. Arms slightly bent, sweep forward like hugging a tree. Control the return.", tip: "Feel the chest stretch at the start position — that stretch is where the muscle growth happens.", link: "https://www.muscleandstrength.com/exercises/resistance-band-chest-fly.html" },
-      { name: "DB Arnold Press (2 kg)", sets: 3, reps: "12", rest: 60, muscles: "All shoulder heads", note: "Start with palms facing you, rotate outward as you press overhead. Reverse on the way down.", tip: "More shoulder activation than a regular press. Builds the round shoulder look you are aiming for.", link: "https://www.muscleandstrength.com/exercises/arnold-dumbbell-press.html" },
-      { name: "DB Front Raise (2 kg)", sets: 3, reps: "12 each arm", rest: 45, muscles: "Front deltoid", note: "Raise one arm forward to shoulder height, thumb facing up. Slow controlled descent. Do not swing your body.", tip: "Very light weight, very strict form. If you need to swing, the weight is too heavy.", link: "https://www.muscleandstrength.com/exercises/dumbbell-front-raise.html" },
-      { name: "Tricep Dips (Chair)", sets: 3, reps: "8–12", rest: 75, muscles: "Triceps, Chest", note: "Hands on stable chair edge. Lower until elbows reach 90°. Press back up. Keep back close to the chair edge.", tip: "Wrist note: If wrists ache, try making fists on the chair edge rather than flat palm.", link: "https://www.muscleandstrength.com/exercises/bench-dip.html" },
-      { name: "Band Overhead Press", sets: 3, reps: "15", rest: 60, muscles: "Shoulders, Triceps", note: "Step on band centre. Press both arms overhead simultaneously. Control the descent — resist the band.", tip: "Band tension increases at the top of the press, making it harder than dumbbells. Stay strict with form.", link: "https://www.muscleandstrength.com/exercises/resistance-band-overhead-press.html" },
-      { name: "Incline Push-up Negative", sets: 3, reps: "6–8", rest: 75, muscles: "Chest, Triceps", note: "Take 5 full seconds to lower yourself down from the top position. Reset and repeat. This builds push-up strength the fastest.", tip: "Negatives (slow lowering phase) cause more muscle damage than the push-up itself — this is intentional.", link: "https://www.muscleandstrength.com/exercises/incline-push-up.html" },
+      { name: "DB Shoulder Press (5 kg)", sets: 4, reps: "10–12", rest: 90, muscles: "All three deltoid heads, Triceps", note: "Sit on chair with back support or stand. Hold 5 kg DB in each hand at shoulder height, palms forward. Press overhead — stop 10° before elbows lock out. Lower slowly over 3 seconds back to start.", tip: "Do not shrug shoulders toward ears. Keep neck long. Think of pressing shoulders DOWN into sockets as arms press UP. This protects the rotator cuff.", link: "https://www.muscleandstrength.com/exercises/seated-dumbbell-press.html" },
+      { name: "DB Lateral Raise (3 kg) — 4-sec lowering", sets: 4, reps: "15", rest: 60, muscles: "Lateral deltoid", note: "Hold 3 kg in each hand, arms slightly in front of body (20° forward, not exactly to sides). Raise arms to shoulder height only — going higher disengages deltoid. Raise takes 1 second. Lowering takes 4 full seconds.", tip: "A slight forward lean (10°) at the hip increases deltoid activation. The slow 4-second descent is the entire exercise — that is where width is built.", link: "https://www.muscleandstrength.com/exercises/dumbbell-lateral-raise.html" },
+      { name: "Pike Push-up", sets: 3, reps: "8–10", rest: 90, muscles: "Shoulders (front + side), Triceps", note: "Start in downward-dog position — hips raised high, body forming inverted V. Hands slightly wider than shoulder-width. Bend elbows, lower head toward floor BETWEEN hands. Press back up until arms straight. Head moves down and slightly forward.", tip: "This is a shoulder-dominant pushing pattern. Unlike regular push-ups (chest dominant), this hits deltoids from above — building the rounded shoulder look.", link: "https://www.muscleandstrength.com/exercises/pike-push-up.html" },
+      { name: "DB Arnold Press (3 kg)", sets: 3, reps: "12", rest: 60, muscles: "All three deltoid heads, Rotator cuff", note: "Start with DBs at chin height, palms facing YOU. As you press up, rotate hands so palms face AWAY at top. Reverse rotation on way down. 2 seconds up with rotation, 1 second at top, 3 seconds down with rotation.", tip: "The rotation activates front and middle deltoid heads through different ranges in one movement. Do not rush past the rotation — it is the point of this exercise.", link: "https://www.muscleandstrength.com/exercises/arnold-dumbbell-press.html" },
+      { name: "Push-up Progression Set", sets: 3, reps: "3–5 floor → knee to 12", rest: 75, muscles: "Chest, Triceps, Shoulders", note: "Same technique as Monday. By Thursday the shoulder work will make these slightly harder — that is the intent. Your chest and triceps must work without fresh shoulders helping. 3 seconds down, 1 second up.", tip: "If you get fewer floor reps than Monday, that is expected after shoulder work. Focus on quality knee push-ups to finish the set.", link: "https://www.muscleandstrength.com/exercises/push-up.html" },
+      { name: "Decline Push-up (feet on chair)", sets: 3, reps: "6–8", rest: 90, muscles: "Upper chest, Front delts", note: "Feet elevated on chair (30 cm). Hands on floor, slightly wider than shoulder-width. Body forms straight line from feet to head. Lower chest toward floor over 3 seconds. Press back up. Elevated feet shift angle to upper chest.", tip: "This is harder than it looks on day one. If you cannot do 5 clean reps, bring feet lower (smaller angle) until you build strength.", link: "https://www.muscleandstrength.com/exercises/decline-push-up.html" },
+      { name: "DB Around-the-World (3 kg) — FAT ZONE", sets: 3, reps: "10 each direction", rest: 60, muscles: "Chest (full pec), Shoulders, Serratus", note: "Lie on mat. Hold 3 kg DB in each hand, arms extended above chest. Move both arms simultaneously in wide circle — from overhead, out to sides, down to hips, and back. Full controlled arc. 3 seconds per half circle. Reverse direction after all reps.", tip: "The full arc loads the pec at every angle — especially outer chest and serratus. These create chest definition and reduce the soft chest appearance.", link: "https://www.muscleandstrength.com/exercises/dumbbell-around-the-world.html" },
     ],
   },
   {
@@ -83,34 +83,34 @@ const DAYS = [
     type: "Pull B",
     color: "#0DBD8B",
     bg: "#E1F5EE",
-    sub: "Back · Biceps · Rear delts — variation",
-    phases: ["5 min warm-up", "30 min strength", "15 min hypertrophy", "10 min cool-down"],
+    sub: "Rear Delts FIRST → Back → Biceps (Variation)",
+    phases: ["5 min warm-up", "35 min pull", "10 min cool-down"],
     exercises: [
-      { name: "Band Straight Arm Pulldown", sets: 4, reps: "15", rest: 60, muscles: "Lats", note: "Anchor band high. Arms straight throughout. Pull down to hips engaging lats the whole way.", tip: "This is the closest movement to a pull-up. It directly trains lats — the muscle you need to build first.", link: "https://www.muscleandstrength.com/exercises/band-lat-pulldown.html" },
-      { name: "DB Chest-supported Row (5 kg)", sets: 4, reps: "10–12", rest: 90, muscles: "Back, Rear delts, Biceps", note: "Lie face-down on inclined chair or stacked firm pillows. Row both DBs up simultaneously. Lower slowly.", tip: "Lower back note: This removes ALL lower back load — the best rowing variation for your situation.", link: "https://www.muscleandstrength.com/exercises/incline-dumbbell-row.html" },
-      { name: "Band High Row", sets: 3, reps: "12–15", rest: 60, muscles: "Upper traps, Rear delts", note: "Anchor band high. Pull toward chin with elbows flaring wide. Hold briefly at the top.", tip: "Targets upper traps and rear delts from a different angle than face pulls — both are needed for full development.", link: "https://www.muscleandstrength.com/exercises/band-upright-row.html" },
-      { name: "DB Concentration Curl (3 kg)", sets: 3, reps: "12 each", rest: 60, muscles: "Biceps (peak)", note: "Seated with elbow braced on inner thigh. Curl slowly. No body movement at all — pure bicep.", tip: "The best bicep isolation exercise in existence. Cheating is impossible — this forces strict form.", link: "https://www.muscleandstrength.com/exercises/concentration-curl.html" },
-      { name: "Band Supinated Curl", sets: 3, reps: "15", rest: 45, muscles: "Biceps", note: "Step on band. Palms fully facing up the ENTIRE movement — do not let them rotate. Curl to shoulder.", tip: "Full supination maximises bicep activation compared to hammer curl. Different days, different angles = more growth.", link: "https://www.muscleandstrength.com/exercises/resistance-band-bicep-curl.html" },
-      { name: "Scapular Wall Slide", sets: 3, reps: "15", rest: 45, muscles: "Serratus, Lower traps", note: "Back, head, elbows, wrists all touching wall. Slide arms up and down without losing contact at any point.", tip: "This single exercise will fix your posture and build the foundation needed for pull-ups. It is underrated.", link: "https://www.muscleandstrength.com/exercises/wall-slides.html" },
-      { name: "Gripper Hold (5 sec)", sets: 3, reps: "8 each hand", rest: 30, muscles: "Forearms, Grip", note: "Max squeeze. Hold 5 full seconds this time — progressive overload from Tuesday's 3-second hold.", tip: "Grip strength carries directly over to rowing movements and eventually to pull-ups.", link: "https://www.muscleandstrength.com/exercises/hand-grip-strengthener.html" },
+      { name: "Band Reverse Fly (paused at peak)", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids", note: "Hold band in front with both hands, arms straight. Hinge forward 30–45° at hip. Open both arms wide like wings until in line with body. At full open position, hold 2 seconds. Return slowly over 3 seconds.", tip: "The 2-second pause removes all momentum and keeps rear delt under tension. The muscle is small — slow, controlled, paused reps beat fast reps every time.", link: "https://www.muscleandstrength.com/exercises/band-reverse-fly.html" },
+      { name: "Band Pull-Apart (3-sec return)", sets: 3, reps: "15", rest: 45, muscles: "Rear delts, Rhomboids, Middle traps", note: "Hold band at shoulder width, arms straight out front. Pull apart until band touches chest. Squeeze shoulder blades together at peak. Return over 3 full seconds — resist the band pulling your hands back together.", tip: "Same movement as Tuesday but with 3-second slow return instead of 2-second squeeze. Different tempo = different stimulus on the same muscles.", link: "https://www.muscleandstrength.com/exercises/band-pull-apart.html" },
+      { name: "DB Chest-supported Row (5 kg each)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Rhomboids, Rear delts, Biceps", note: "Lie face-down on steeply inclined chair or firm stacked pillows (30–40° angle). Hold 5 kg DB in each hand, arms hanging. Row both DBs upward — elbows back and slightly out. Squeeze shoulder blades 1 second. Lower over 3 seconds.", tip: "Zero lower back involvement — the incline takes it out completely. On Friday your lower back may be tired from the week. This lets you train back intensely without spinal fatigue.", link: "https://www.muscleandstrength.com/exercises/incline-dumbbell-row.html" },
+      { name: "Band High Row (2-sec pause)", sets: 3, reps: "12–15", rest: 60, muscles: "Upper traps, Rear delts", note: "Anchor band at forehead height. Pull toward chin with elbows flaring high and wide. At top — elbows high, hands near chin — hold 2 full seconds. Lower slowly.", tip: "Targets upper traps and rear delts from a different angle than face pulls — both are needed for full back development.", link: "https://www.muscleandstrength.com/exercises/band-upright-row.html" },
+      { name: "DB Concentration Curl (5 kg)", sets: 3, reps: "12 each arm", rest: 75, muscles: "Bicep peak (short head)", note: "Sit on chair edge, legs apart. Rest elbow on INSIDE of thigh (not knee — on thigh, lower). Hold 5 kg DB. Curl slowly over 2 seconds. At peak, supinate wrist (rotate palm toward shoulder) and squeeze 1 second. Lower over 4 seconds.", tip: "With elbow braced on thigh, swinging is physically impossible. Every rep is pure bicep. The 4-second lowering is where the muscle tears and regrows.", link: "https://www.muscleandstrength.com/exercises/concentration-curl.html" },
+      { name: "Band Supinated Curl (midpoint pause)", sets: 3, reps: "15", rest: 45, muscles: "Biceps", note: "Step on band. Palms FULLY facing up entire movement — do not let them rotate. Curl to shoulder height. Pause 1 second when arms at 90° (halfway up) — this is the hardest point. Continue to top. Lower slowly.", tip: "The midpoint pause creates an isometric contraction at the weakest point of the curl. This eliminates momentum and makes a light band genuinely difficult.", link: "https://www.muscleandstrength.com/exercises/resistance-band-bicep-curl.html" },
+      { name: "Russian Twist — Seated (FAT ZONE)", sets: 3, reps: "20 total (10 each side)", rest: 45, muscles: "Obliques, Rotational core", note: "Sit on chair edge or mat. Knees bent, feet flat. Hold 3 kg DB with both hands. Lean back slightly (30°) so core engaged. Rotate DB from side to side, touching near hip each time. Chest up, facing forward — only arms and upper torso rotate. 2 seconds to each side.", tip: "Moving the dumbbell fast makes it easier (momentum). Slow it down — the rotation is the work. Done seated on chair edge, this requires about 60 cm of space.", link: "https://www.muscleandstrength.com/exercises/russian-twist.html" },
     ],
   },
   {
     key: "sat",
     label: "Saturday",
-    type: "Legs B + Core",
+    type: "Legs B",
     color: "#FF6B35",
     bg: "#FAECE7",
-    sub: "Glutes · Hamstrings · Calves · Core — variation",
-    phases: ["8 min warm-up + knee prep", "25 min leg work", "15 min core", "12 min cool-down & mobility"],
+    sub: "Hamstrings · Calves · Knee Strengthening",
+    phases: ["8 min warm-up + knee prep", "30 min legs", "10 min cool-down"],
     exercises: [
-      { name: "Single-leg Glute Bridge", sets: 3, reps: "12 each leg", rest: 60, muscles: "Glutes, Hamstrings", note: "Lie flat. One leg bent foot on floor, other extended. Drive hips up with the bent leg. Squeeze hard at top.", tip: "If too difficult, keep toes of extended leg lightly touching floor for support. Progress to fully lifted over weeks.", link: "https://www.muscleandstrength.com/exercises/single-leg-glute-bridge.html" },
-      { name: "Romanian DB Deadlift (5 kg)", sets: 4, reps: "10–12", rest: 90, muscles: "Hamstrings, Glutes, Lower back", note: "Slight knee bend only — maintain it throughout. Hinge at hip, DBs slide down legs. Feel hamstring stretch. Drive hips forward to return.", tip: "Lower back note: Keep chest up and back neutral. Hinge at hip — NOT at the waist. These are different movements.", link: "https://www.muscleandstrength.com/exercises/romanian-deadlift.html" },
-      { name: "Calf Raise", sets: 4, reps: "20", rest: 45, muscles: "Calves", note: "Stand on edge of step. Full range — full stretch at the bottom, full raise at the top. Control both directions.", tip: "For running endurance, calves are critical. Slow tempo: 2 sec up, 2 sec down. Do not bounce.", link: "https://www.muscleandstrength.com/exercises/standing-calf-raise.html" },
-      { name: "Band Squat (Feet Wide)", sets: 3, reps: "15", rest: 60, muscles: "Quads, Glutes, Hip abductors", note: "Band just above knees — it will try to push knees in; resist by pushing knees OUT. Wide stance squat. Stop 10–15° before full extension.", tip: "Knee safety: The band resistance directly trains your knees to stay in correct alignment. This is therapeutic as well as strength work.", link: "https://www.muscleandstrength.com/exercises/resistance-band-squat.html" },
-      { name: "Hollow Body Hold", sets: 3, reps: "20–30 sec", rest: 45, muscles: "Core, Hip flexors", note: "Lie flat. Press lower back firmly into floor. Raise arms overhead and legs to 45°. Hold. Do not let back arch.", tip: "If lower back lifts, raise your legs higher until it stays down. Shorten hold time before reducing leg height.", link: "https://www.muscleandstrength.com/exercises/hollow-hold.html" },
-      { name: "Side Plank", sets: 3, reps: "25 sec each side", rest: 45, muscles: "Obliques, Glutes, Lower back", note: "Elbow directly under shoulder. Hip raised, body in a straight line. Do not let hip sag downward.", tip: "Directly addresses your lower back discomfort. Oblique and glute strength both support the lower back.", link: "https://www.muscleandstrength.com/exercises/side-plank.html" },
-      { name: "Reverse Crunch", sets: 3, reps: "15", rest: 45, muscles: "Lower abs", note: "Lie on back, arms flat by sides. Curl hips toward chest using lower abs — no momentum or swinging. Lower slowly.", tip: "Lower back must stay pressed against the floor throughout. Slow lowering = significantly more effective.", link: "https://www.muscleandstrength.com/exercises/reverse-crunch.html" },
+      { name: "Terminal Knee Extension — Band (KNEE FIX)", sets: 3, reps: "15 each leg", rest: 30, muscles: "VMO, Knee stabilisers", note: "Anchor band at knee height behind you. Loop around back of one knee. Stand on that leg, slight bend. Straighten knee against band resistance — STOP 5–10° before fully straight. Hold 1 second. Return to bent. This starts every leg session.", tip: "Non-negotiable exercise 1 on both leg days. The VMO is the last muscle to activate in the quad chain and the first to weaken. Every knee pain issue traces back here.", link: "https://www.muscleandstrength.com/exercises/terminal-knee-extension.html" },
+      { name: "Romanian DB Deadlift (5 kg each)", sets: 4, reps: "10–12", rest: 90, muscles: "Hamstrings, Glutes, Lower back", note: "Hold 5 kg DB in each hand (10 kg total). Stand tall, slight knee bend — maintain throughout. Hinge at HIP by pushing hips backward. Torso lowers as hips go back. DBs slide down legs (touching thighs). When max stretch at mid-shin, drive hips FORWARD to stand.", tip: "A hip hinge keeps spine neutral and uses hamstrings/glutes. Bending at the waist rounds the spine. They look similar but are very different. Practice without weight first.", link: "https://www.muscleandstrength.com/exercises/romanian-deadlift.html" },
+      { name: "Single-leg Calf Raise (step edge)", sets: 4, reps: "15 each leg", rest: 45, muscles: "Gastrocnemius, Soleus", note: "Stand on edge of step on ONE foot. Hold wall for balance only — do not push off. Lower heel fully below step. Raise onto toes fully. 2 seconds up, 2 seconds down. At bottom, pause 1 second in stretched position.", tip: "The 1-second pause at the bottom increases Achilles tendon strength which directly reduces walking/running knee stress.", link: "https://www.muscleandstrength.com/exercises/standing-one-leg-calf-raise.html" },
+      { name: "Band Squat — Goblet Hold (5 kg)", sets: 3, reps: "12–15", rest: 75, muscles: "Quads, Glutes, Hip abductors", note: "Band just above knees. Hold one 5 kg DB at chest (goblet position — both hands cupping one end). Feet shoulder-width, toes out 20–30°. Squat pushing knees OUT against band while hips go back and down. Rise pressing floor away. Stop 10–15° before lockout.", tip: "The band forcing knees out trains hip abductors to resist knee caving. The goblet hold keeps torso upright, reducing knee stress.", link: "https://www.muscleandstrength.com/exercises/goblet-squat.html" },
+      { name: "Clamshell — Band", sets: 3, reps: "20 each side", rest: 45, muscles: "Glute medius, Hip external rotators", note: "Lie on side. Band just above knees. Knees bent at 90°. Keeping feet together and hips stacked vertically, rotate top knee upward like a clamshell opening. Stop when hips start to rotate backward. Lower. Hip must not tilt.", tip: "The glute medius is the primary muscle preventing knee valgus (caving inward) during walking. This is the isolated exercise that directly targets it.", link: "https://www.muscleandstrength.com/exercises/clamshell.html" },
+      { name: "Wall Sit — Single Leg", sets: 3, reps: "20–25 sec each leg", rest: 60, muscles: "VMO, Quads", note: "Wall sit position (back flat, thigh parallel). Lift one foot off floor. Hold on one leg only. Start with 15 seconds if 20 is too much. Knee NEVER locks out.", tip: "This is very hard — it is designed to be. Elite VMO strength = no knee pain on long walks. Progress from 15 to 25 seconds over weeks.", link: "https://www.muscleandstrength.com/exercises/wall-sit.html" },
+      { name: "DB Side Bend (5 kg) — FAT ZONE", sets: 3, reps: "15 each side", rest: 45, muscles: "Obliques, Quadratus lumborum", note: "Stand tall. Hold 5 kg DB in right hand. Left hand on hip. Keeping hips completely square and still, bend sideways to right — DB slides down right leg. Feel LEFT oblique stretching. Return upright by contracting left oblique. Complete all 15, then switch.", tip: "Hips must not tilt. The movement is pure lateral spine flexion. If your hips shift, you are not training obliques — you are just moving. The obliques sit directly under the love handle area.", link: "https://www.muscleandstrength.com/exercises/dumbbell-side-bend.html" },
     ],
   },
 ];
@@ -178,81 +178,72 @@ function buildNotion(day) {
   });
   t += `## Session notes\n\n`;
   t += `**Date:** ___________  \n**Energy level (1–10):** ___  \n**Overall feel:** \n\n`;
-  t += `---\n*Home workout plan — 80 kg, 5'8–9 · Dumbbells + resistance bands · Evening sessions*\n`;
+  t += `---\n*Phase 2 Recomp — 80 kg, 5'8–9 · Dumbbells 2/3/5 kg + Bands + Mat · Late night sessions*\n`;
   return t;
 }
 
 // ─── LOCAL EXERCISEDB GIF LOOKUP ─────────────────────────────────────────────
-// Hand-crafted map: every workout exercise → best GIF from exercises.json
-// Verified manually by comparing muscle group + movement against all 30 entries.
-// GIF files served from /gifs/ (public/gifs/ ← archive/.../gifs_360x360/)
 
-// Helper: wrap filename as served URL
 const g = (f: string) => `/gifs/${f}`;
 
-// ── Precision map: workout-exercise-name (normalised) → GIF filename ──────────
-// Normalisation: lowercase, strip weight annotations, strip special chars, trim.
 const WORKOUT_GIF_MAP: Record<string, string> = {
-  // PUSH A
-  "incline push-up":            g("3TZduzM.gif"), // barbell incline bench press — incline chest
-  "band chest press":           g("5v7KYld.gif"), // smith incline bench press — horizontal chest press
-  "db shoulder press":          g("6cKQC5E.gif"), // dumbbell one arm upright row — shoulder/dumbbell
-  "band lateral raise":         g("3eGE2JC.gif"), // dumbbell front raise — delt raise motion
-  "db tricep overhead ext":     g("5uFK1xr.gif"), // barbell seated overhead triceps extension ✅ exact motion
-  "band tricep pushdown":       g("6MfS53i.gif"), // dumbbell lying single extension — triceps isolation
-  "wall push-up iso hold":      g("05Cf2v8.gif"), // impossible dips — bodyweight chest/triceps hold
+  // PUSH A (Monday)
+  "push-up progression set":        g("05Cf2v8.gif"),
+  "db floor chest press":           g("5v7KYld.gif"),
+  "band chest fly":                 g("7saC5zz.gif"),
+  "tricep dips — chair":            g("05Cf2v8.gif"),
+  "db tricep overhead extension":   g("5uFK1xr.gif"),
+  "band tricep pushdown":           g("6MfS53i.gif"),
+  "db pullover":                    g("3TZduzM.gif"),
 
-  // PULL A
-  "band pull-apart":            g("7I6LNUG.gif"), // lever seated row — horizontal back pull
-  "db bent-over row":           g("7I6LNUG.gif"), // lever seated row ✅ back row motion
-  "band face pull":             g("7F1DVzn.gif"), // lever front pulldown — pulling for rear delts
-  "db bicep curl":              g("8oYqOt9.gif"), // cable seated curl — seated bicep curl
-  "band hammer curl":           g("4dF3maG.gif"), // dumbbell one arm hammer preacher curl ✅ exact hammer curl
-  "band reverse fly":           g("7saC5zz.gif"), // cable decline fly — fly/reverse fly motion
-  "gripper squeeze":            g("3tAXPQ6.gif"), // dumbbell over bench revers wrist curl — forearms/grip
+  // PULL A (Tuesday)
+  "band face pull":                 g("7F1DVzn.gif"),
+  "band pull-apart":                g("7I6LNUG.gif"),
+  "db bent-over row":               g("7I6LNUG.gif"),
+  "band straight-arm pulldown":     g("7F1DVzn.gif"),
+  "db bicep curl":                  g("8oYqOt9.gif"),
+  "band hammer curl":               g("4dF3maG.gif"),
+  "band woodchop":                  g("6bOA1Oi.gif"),
 
-  // LEGS A + CORE
-  "wall sit":                   g("5bpPTHv.gif"), // kettlebell pistol squat — quad/leg hold
-  "glute bridge":               g("6sYyrRX.gif"), // bent knee lying twist — lying, knees bent, glutes
-  "step-up":                    g("5bpPTHv.gif"), // kettlebell pistol squat — single-leg lower body
-  "band lateral walk":          g("2Qh2J1e.gif"), // sled 45 leg press — glutes/hip abductors
-  "dead bug":                   g("8xUv4J7.gif"), // cable seated crunch — core activation
-  "plank":                      g("8urJS9b.gif"), // weighted hyperextension — core/spine stability
-  "bird dog":                   g("8urJS9b.gif"), // weighted hyperextension — lower back/core
+  // LEGS A (Wednesday)
+  "terminal knee extension":        g("5bpPTHv.gif"),
+  "wall sit":                       g("5bpPTHv.gif"),
+  "single-leg glute bridge":        g("6sYyrRX.gif"),
+  "band lateral walk":              g("2Qh2J1e.gif"),
+  "step-up":                        g("5bpPTHv.gif"),
+  "pallof press":                   g("8xUv4J7.gif"),
+  "calf raise":                     g("2ORFMoR.gif"),
 
-  // PUSH B
-  "knee push-up":               g("05Cf2v8.gif"), // impossible dips — bodyweight chest/triceps
-  "band chest fly":             g("7saC5zz.gif"), // cable decline fly ✅ fly motion for chest
-  "db arnold press":            g("6cKQC5E.gif"), // dumbbell one arm upright row — overhead shoulder
-  "db front raise":             g("3eGE2JC.gif"), // dumbbell front raise ✅ exact match
-  "tricep dips":                g("05Cf2v8.gif"), // impossible dips ✅ exact dips
-  "band overhead press":        g("5uFK1xr.gif"), // barbell seated overhead triceps extension — overhead press
-  "incline push-up negative":   g("3TZduzM.gif"), // barbell incline bench press — incline chest
+  // PUSH B (Thursday)
+  "db shoulder press":              g("6cKQC5E.gif"),
+  "db lateral raise":               g("3eGE2JC.gif"),
+  "pike push-up":                   g("05Cf2v8.gif"),
+  "db arnold press":                g("6cKQC5E.gif"),
+  "decline push-up":                g("3TZduzM.gif"),
+  "db around-the-world":            g("7saC5zz.gif"),
 
-  // PULL B
-  "band straight arm pulldown": g("7F1DVzn.gif"), // lever front pulldown ✅ lat pulldown motion
-  "db chest-supported row":     g("7I6LNUG.gif"), // lever seated row ✅ back row
-  "band high row":              g("6cKQC5E.gif"), // dumbbell one arm upright row ✅ upright row
-  "db concentration curl":      g("7inpWch.gif"), // dumbbell standing concentration curl ✅ exact match
-  "band supinated curl":        g("4dUn2iv.gif"), // barbell standing close grip curl — standing bicep curl
-  "scapular wall slide":        g("7F1DVzn.gif"), // lever front pulldown — lat/back pulling
-  "gripper hold":               g("3tAXPQ6.gif"), // dumbbell over bench revers wrist curl — forearms
+  // PULL B (Friday)
+  "band reverse fly":               g("7saC5zz.gif"),
+  "db chest-supported row":         g("7I6LNUG.gif"),
+  "band high row":                  g("6cKQC5E.gif"),
+  "db concentration curl":          g("7inpWch.gif"),
+  "band supinated curl":            g("4dUn2iv.gif"),
+  "russian twist":                  g("6bOA1Oi.gif"),
 
-  // LEGS B + CORE
-  "single-leg glute bridge":    g("6sYyrRX.gif"), // bent knee lying twist — lying single-leg glute
-  "romanian db deadlift":       g("8urJS9b.gif"), // weighted hyperextension — posterior chain/low-back
-  "calf raise":                 g("2ORFMoR.gif"), // hack calf raise ✅ exact calf raise
-  "band squat":                 g("5bpPTHv.gif"), // kettlebell pistol squat — squat movement
-  "hollow body hold":           g("8K0w2yA.gif"), // assisted hanging knee raise — core/hip flexors
-  "side plank":                 g("6bOA1Oi.gif"), // weighted side bend stability ball ✅ obliques/side
-  "reverse crunch":             g("8K0w2yA.gif"), // assisted hanging knee raise — lower abs
+  // LEGS B (Saturday)
+  "romanian db deadlift":           g("8urJS9b.gif"),
+  "single-leg calf raise":         g("2ORFMoR.gif"),
+  "band squat":                     g("5bpPTHv.gif"),
+  "clamshell":                      g("6sYyrRX.gif"),
+  "wall sit — single leg":          g("5bpPTHv.gif"),
+  "db side bend":                   g("6bOA1Oi.gif"),
 };
 
 // Normalise a workout exercise name for map lookup
 function normaliseWorkout(s: string): string {
   return s.toLowerCase()
     .replace(/\([^)]*\)/g, '')   // remove (2 kg), (low step), (5 sec) etc.
-    .replace(/[^a-z0-9 \-]/g, '') // keep letters, digits, spaces, hyphens
+    .replace(/[^a-z0-9 \-—]/g, '') // keep letters, digits, spaces, hyphens, em-dash
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -264,14 +255,14 @@ function findLocalGif(exerciseName: string): string | null {
   // 1. Direct key lookup
   if (WORKOUT_GIF_MAP[key]) return WORKOUT_GIF_MAP[key];
 
-  // 2. Prefix/substring match (e.g. "incline push-up negative" ⊇ "incline push-up")
+  // 2. Prefix/substring match
   for (const mapKey of Object.keys(WORKOUT_GIF_MAP)) {
     if (key.startsWith(mapKey) || mapKey.startsWith(key)) {
       return WORKOUT_GIF_MAP[mapKey];
     }
   }
 
-  // 3. Word-overlap fallback against the map keys
+  // 3. Word-overlap fallback
   const words = key.split(' ').filter(w => w.length > 3);
   let bestKey = '';
   let bestScore = 0;
@@ -294,7 +285,6 @@ function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSk
   const [open, setOpen] = useState(false);
   const allDone = doneSets.length >= ex.sets;
 
-  // Resolve local GIF from the dataset
   const gifUrl = findLocalGif(ex.name);
 
   return (
@@ -333,7 +323,7 @@ function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSk
       {/* Body */}
       {open && (
         <div style={{ borderTop: "1px solid #F0F0F0", padding: 16 }}>
-          {/* Exercise Animation Preview — served from local ExerciseDB dataset */}
+          {/* Exercise Animation Preview */}
           {gifUrl && (
             <div style={{
               marginBottom: 14, borderRadius: 12, overflow: "hidden",
@@ -345,7 +335,6 @@ function ExerciseCard({ ex, exIdx, dayColor, doneSets, onSetDone, timerVal, onSk
                 src={gifUrl}
                 alt={`${ex.name} animation`}
                 style={{
-                  width: "100%", height: "auto", maxHeight: 320,
                   objectFit: "contain",
                   display: "block",
                 }}
@@ -548,9 +537,9 @@ export default function WorkoutApp() {
 
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "#AAA", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Home Workout Plan</div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#111" }}>Mon–Sat Trainer</div>
-        <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>80 kg · Dumbbells + bands · Evening sessions</div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "#AAA", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Phase 2 · Recomp Plan</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#111" }}>Aztec Body Trainer</div>
+        <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>80 kg · Dumbbells 2/3/5 kg + Bands + Mat · Late night sessions</div>
       </div>
 
       {/* Day selector */}
@@ -617,7 +606,7 @@ export default function WorkoutApp() {
         {[
           { val: day.exercises.length, lbl: "Exercises" },
           { val: totalSets, lbl: "Total sets" },
-          { val: "60 min", lbl: "Est. duration" },
+          { val: "50 min", lbl: "Est. duration" },
         ].map(({ val, lbl }) => (
           <div key={lbl} style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 12, padding: "12px", textAlign: "center" }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: "#111" }}>{val}</div>
@@ -648,7 +637,7 @@ export default function WorkoutApp() {
         }}>
           <div style={{ fontSize: 28 }}>💪</div>
           <div style={{ fontSize: 17, fontWeight: 700, color: "#085041", marginTop: 6 }}>Session complete!</div>
-          <div style={{ fontSize: 13, color: "#0F6E56", marginTop: 4 }}>Great work. Rest, eat protein, sleep well.</div>
+          <div style={{ fontSize: 13, color: "#0F6E56", marginTop: 4 }}>Great work. Eat within 45 min — protein + carbs. Sleep is when muscle is built.</div>
         </div>
       )}
 
@@ -657,8 +646,8 @@ export default function WorkoutApp() {
 
       {/* Footer */}
       <div style={{ marginTop: 32, paddingTop: 16, borderTop: "1px solid #F0F0F0", fontSize: 11, color: "#CCC", textAlign: "center", lineHeight: 1.6 }}>
-        Protein: 90g+ daily · Soy isolate + 6 eggs · Sunday: full rest<br />
-        Knee: never lock out · Lower back: neutral spine always
+        Phase 2 Recomp · Protein: 90g+ daily · No caffeine after 4pm · 10-min cool-down is not optional<br />
+        Knee: never lock out · VMO + hip abductors every leg day · Neck protocol every push/pull day
       </div>
     </div>
   );
