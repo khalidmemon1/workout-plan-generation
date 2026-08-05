@@ -833,22 +833,43 @@ export default function WorkoutApp() {
   const [showCalendar, setShowCalendar] = useState(false);
   const { timers, startTimer, skipTimer } = useRestTimer();
 
-  // Whole app is gated behind one shared password — nothing renders until
-  // this is true, whether from a saved device password or a fresh unlock.
+  // Whole app is gated behind one shared password. A password already saved
+  // on this device is trusted immediately — no "checking…" round trip before
+  // the UI shows up on every single visit, that's just for the first unlock.
   const [password, setPassword] = useState<string | null>(() =>
     typeof window !== "undefined" ? localStorage.getItem("wp_password") : null
   );
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(() => !!password);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
+  // Fetches today's logs + streak — runs quietly in the background on every
+  // load, doesn't gate the UI. If the server says the saved password is no
+  // longer valid (e.g. it was changed), that's the one case it relocks.
+  const loadData = useCallback((pw: string) => {
+    fetch(`/api/progress?date=${todayStr()}`, { headers: { "x-app-password": pw } })
+      .then(async (r) => {
+        if (r.status === 401) {
+          localStorage.removeItem("wp_password");
+          setPassword(null);
+          setUnlocked(false);
+          return;
+        }
+        const data = await r.json();
+        if (data.today) setLogs(data.today);
+        if (data.streak) setStreak(data.streak);
+      })
+      .catch(() => {}); // offline-safe — just keep whatever's already shown
+  }, []);
+
+  // First-ever unlock on this device — this one DOES need to verify before
+  // granting access, since there's no saved password to trust yet.
   const authenticate = useCallback((pw: string) => {
     setAuthLoading(true);
     setAuthError(null);
     fetch(`/api/progress?date=${todayStr()}`, { headers: { "x-app-password": pw } })
       .then(async (r) => {
         if (r.status === 401) {
-          localStorage.removeItem("wp_password");
           setAuthError("Wrong password");
           return;
         }
@@ -863,9 +884,8 @@ export default function WorkoutApp() {
       .finally(() => setAuthLoading(false));
   }, []);
 
-  // Auto-unlock silently if a password is already saved on this device.
   useEffect(() => {
-    if (password) authenticate(password);
+    if (password) loadData(password);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
