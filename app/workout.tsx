@@ -336,37 +336,43 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
   }, [onClose]);
 
   return (
-    <div ref={rootRef} style={{
-      position: "absolute", top: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
-      zIndex: 999, background: "#fff", border: "1px solid #E8E8E8", borderRadius: 12,
-      padding: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.16)", width: 208,
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: "rgba(0,0,0,0.45)", padding: 24,
     }}>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "#AAA", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>Actual reps</div>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-        {chips.map((n) => (
-          <button key={n} onClick={() => onPick(n)} style={{
-            width: 36, height: 36, borderRadius: 8, border: `1.5px solid ${dayColor}`,
-            background: `${dayColor}14`, color: dayColor, fontSize: 14, fontWeight: 700, cursor: "pointer",
+      <div ref={rootRef} style={{
+        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 14,
+        padding: 16, width: "100%", maxWidth: 260,
+        boxShadow: "0 12px 32px rgba(0,0,0,0.25)",
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "#AAA", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "center" }}>Actual reps</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10, justifyContent: "center" }}>
+          {chips.map((n) => (
+            <button key={n} onClick={() => onPick(n)} style={{
+              width: 44, height: 44, borderRadius: 10, border: `1.5px solid ${dayColor}`,
+              background: `${dayColor}14`, color: dayColor, fontSize: 16, fontWeight: 700, cursor: "pointer",
+              touchAction: "manipulation",
+            }}>{n}</button>
+          ))}
+          <button onClick={() => onPick(0)} style={{
+            height: 44, padding: "0 14px", borderRadius: 10, border: "1.5px solid #EEE",
+            background: "#F8F8F8", color: "#999", fontSize: 13, fontWeight: 600, cursor: "pointer",
             touchAction: "manipulation",
-          }}>{n}</button>
-        ))}
-        <button onClick={() => onPick(0)} style={{
-          height: 36, padding: "0 10px", borderRadius: 8, border: "1.5px solid #EEE",
-          background: "#F8F8F8", color: "#999", fontSize: 12, fontWeight: 600, cursor: "pointer",
-          touchAction: "manipulation",
-        }}>Skip</button>
-      </div>
-      <div style={{ display: "flex", gap: 6 }}>
-        <input
-          type="number" inputMode="numeric" value={custom}
-          onChange={(e) => setCustom(e.target.value)}
-          placeholder="Custom #"
-          style={{ flex: 1, minWidth: 0, height: 36, borderRadius: 8, border: "1px solid #E8E8E8", padding: "0 10px", fontSize: 14 }}
-        />
-        <button
-          onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) onPick(n); }}
-          style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: dayColor, color: "#fff", fontWeight: 700, cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}
-        >✓</button>
+          }}>Skip</button>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            type="number" inputMode="numeric" value={custom}
+            onChange={(e) => setCustom(e.target.value)}
+            placeholder="Custom #"
+            style={{ flex: 1, minWidth: 0, height: 44, borderRadius: 10, border: "1px solid #E8E8E8", padding: "0 12px", fontSize: 15, boxSizing: "border-box" }}
+          />
+          <button
+            onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) onPick(n); }}
+            style={{ width: 44, height: 44, borderRadius: 10, border: "none", background: dayColor, color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}
+          >✓</button>
+        </div>
       </div>
     </div>
   );
