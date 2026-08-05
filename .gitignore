@@ -8,9 +8,16 @@ __v0_jsx-dev-runtime.ts
 next.user-config.*
 
 # Environment variables
+.env
 .env*.local
 
 # Common ignores
 node_modules
 .next/
 .DS_Store
+
+# Raw exercise dataset dumps (source material — only the ~34 gifs actually used
+# get copied into public/gifs/; the full ~140MB dataset doesn't need to be committed)
+/archive/
+/exercises-dataset-main/
+*.zip
