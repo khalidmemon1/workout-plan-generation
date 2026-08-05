@@ -314,47 +314,61 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
   onPick: (reps: number | null) => void; onClose: () => void;
 }) {
   const [custom, setCustom] = useState("");
+  const rootRef = useRef<HTMLDivElement>(null);
   const chips = repsRange
     ? Array.from(new Set([repsRange.min, repsRange.min + 1, repsRange.max - 1, repsRange.max].filter((n) => n > 0))).sort((a, b) => a - b)
     : [];
 
+  // Close on an outside tap — but only start listening a tick after mount, so
+  // the trailing synthetic click from the *same* tap that opened this popover
+  // (which lands wherever the popover now sits) doesn't instantly close it
+  // again. Without the delay this closed the popover the instant it opened,
+  // which looked like the keyboard flickering open then shut on mobile.
+  useEffect(() => {
+    const handleOutside = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onClose();
+    };
+    const id = window.setTimeout(() => document.addEventListener("pointerdown", handleOutside), 0);
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener("pointerdown", handleOutside);
+    };
+  }, [onClose]);
+
   return (
-    <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 998 }} />
-      <div style={{
-        position: "absolute", top: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
-        zIndex: 999, background: "#fff", border: "1px solid #E8E8E8", borderRadius: 12,
-        padding: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.16)", width: 208,
-      }}>
-        <div style={{ fontSize: 10, fontWeight: 600, color: "#AAA", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>Actual reps</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-          {chips.map((n) => (
-            <button key={n} onClick={() => onPick(n)} style={{
-              width: 36, height: 36, borderRadius: 8, border: `1.5px solid ${dayColor}`,
-              background: `${dayColor}14`, color: dayColor, fontSize: 14, fontWeight: 700, cursor: "pointer",
-              touchAction: "manipulation",
-            }}>{n}</button>
-          ))}
-          <button onClick={() => onPick(0)} style={{
-            height: 36, padding: "0 10px", borderRadius: 8, border: "1.5px solid #EEE",
-            background: "#F8F8F8", color: "#999", fontSize: 12, fontWeight: 600, cursor: "pointer",
+    <div ref={rootRef} style={{
+      position: "absolute", top: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
+      zIndex: 999, background: "#fff", border: "1px solid #E8E8E8", borderRadius: 12,
+      padding: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.16)", width: 208,
+    }}>
+      <div style={{ fontSize: 10, fontWeight: 600, color: "#AAA", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>Actual reps</div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+        {chips.map((n) => (
+          <button key={n} onClick={() => onPick(n)} style={{
+            width: 36, height: 36, borderRadius: 8, border: `1.5px solid ${dayColor}`,
+            background: `${dayColor}14`, color: dayColor, fontSize: 14, fontWeight: 700, cursor: "pointer",
             touchAction: "manipulation",
-          }}>Skip</button>
-        </div>
-        <div style={{ display: "flex", gap: 6 }}>
-          <input
-            type="number" inputMode="numeric" value={custom} autoFocus
-            onChange={(e) => setCustom(e.target.value)}
-            placeholder="Custom #"
-            style={{ flex: 1, minWidth: 0, height: 36, borderRadius: 8, border: "1px solid #E8E8E8", padding: "0 10px", fontSize: 14 }}
-          />
-          <button
-            onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) onPick(n); }}
-            style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: dayColor, color: "#fff", fontWeight: 700, cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}
-          >✓</button>
-        </div>
+          }}>{n}</button>
+        ))}
+        <button onClick={() => onPick(0)} style={{
+          height: 36, padding: "0 10px", borderRadius: 8, border: "1.5px solid #EEE",
+          background: "#F8F8F8", color: "#999", fontSize: 12, fontWeight: 600, cursor: "pointer",
+          touchAction: "manipulation",
+        }}>Skip</button>
       </div>
-    </>
+      <div style={{ display: "flex", gap: 6 }}>
+        <input
+          type="number" inputMode="numeric" value={custom}
+          onChange={(e) => setCustom(e.target.value)}
+          placeholder="Custom #"
+          style={{ flex: 1, minWidth: 0, height: 36, borderRadius: 8, border: "1px solid #E8E8E8", padding: "0 10px", fontSize: 14 }}
+        />
+        <button
+          onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) onPick(n); }}
+          style={{ width: 36, height: 36, borderRadius: 8, border: "none", background: dayColor, color: "#fff", fontWeight: 700, cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}
+        >✓</button>
+      </div>
+    </div>
   );
 }
 
