@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 function todayStr(): string {
   const d = new Date();
@@ -306,7 +307,7 @@ function findLocalGif(exerciseName: string): string | null {
 
 // ─── SET LOGGING (hold 3s = full reps, tap = enter actual reps) ─────────────
 
-type SetLog = { reps: number | null; mode: "hold" | "tap" };
+type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" };
 type ExLogs = Record<number, SetLog>;
 
 function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
@@ -471,11 +472,115 @@ function SetPipRow({ ex, exIdx, dayColor, logs, onConfirm }: {
   );
 }
 
+// ─── WEIGHT TRACKING ─────────────────────────────────────────────────────────
+
+function WeightPopover({ dayColor, current, onSave, onClose }: {
+  dayColor: string; current: number | null;
+  onSave: (weight: number | null) => void; onClose: () => void;
+}) {
+  const [value, setValue] = useState(current != null ? String(current) : "");
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Same delayed-outside-tap-to-close as RepsPopover — avoids the trailing
+  // synthetic click from the tap that opened this instantly closing it again.
+  useEffect(() => {
+    const handleOutside = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onClose();
+    };
+    const id = window.setTimeout(() => document.addEventListener("pointerdown", handleOutside), 0);
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener("pointerdown", handleOutside);
+    };
+  }, [onClose]);
+
+  const bump = (delta: number) => setValue((v) => String(Math.max(0, (parseFloat(v) || 0) + delta)));
+  const save = () => {
+    const n = parseFloat(value);
+    onSave(Number.isNaN(n) ? null : n);
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: "rgba(0,0,0,0.45)", padding: 24,
+    }}>
+      <div ref={rootRef} style={{
+        background: "#fff", border: "1px solid #E8E8E8", borderRadius: 14,
+        padding: 18, width: "100%", maxWidth: 260,
+        boxShadow: "0 12px 32px rgba(0,0,0,0.25)",
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "#AAA", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "center" }}>Weight (kg)</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <button onClick={() => bump(-2.5)} style={{ width: 40, height: 40, borderRadius: 10, border: "1px solid #E8E8E8", background: "#F8F8F8", fontSize: 16, fontWeight: 700, color: "#555", cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}>−</button>
+          <input
+            type="number" inputMode="decimal" value={value} autoFocus={false}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="0"
+            style={{ flex: 1, minWidth: 0, height: 44, borderRadius: 10, border: "1px solid #E8E8E8", padding: "0 8px", fontSize: 18, fontWeight: 700, textAlign: "center", boxSizing: "border-box" }}
+          />
+          <button onClick={() => bump(2.5)} style={{ width: 40, height: 40, borderRadius: 10, border: "1px solid #E8E8E8", background: "#F8F8F8", fontSize: 16, fontWeight: 700, color: "#555", cursor: "pointer", flexShrink: 0, touchAction: "manipulation" }}>+</button>
+        </div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 14, justifyContent: "center" }}>
+          {[-5, -1, +1, +5].map((d) => (
+            <button key={d} onClick={() => bump(d)} style={{
+              padding: "5px 10px", borderRadius: 8, border: "1px solid #EEE", background: "#F8F8F8",
+              color: "#888", fontSize: 11, fontWeight: 600, cursor: "pointer", touchAction: "manipulation",
+            }}>{d > 0 ? `+${d}` : d}</button>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => onSave(null)} style={{
+            flex: 1, height: 40, borderRadius: 10, border: "1px solid #EEE", background: "#F8F8F8",
+            color: "#999", fontSize: 13, fontWeight: 600, cursor: "pointer", touchAction: "manipulation",
+          }}>Clear</button>
+          <button onClick={save} style={{
+            flex: 2, height: 40, borderRadius: 10, border: "none", background: dayColor,
+            color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", touchAction: "manipulation",
+          }}>Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WeightChip({ dayColor, weight, onChange }: {
+  dayColor: string; weight: number | null; onChange: (weight: number | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(true)}
+        style={{
+          display: "flex", alignItems: "center", gap: 4, height: 26, padding: "0 10px",
+          borderRadius: 20, border: `1.5px solid ${weight != null ? dayColor : "#E8E8E8"}`,
+          background: weight != null ? `${dayColor}14` : "#F8F8F8",
+          color: weight != null ? dayColor : "#999", fontSize: 12, fontWeight: 700,
+          cursor: "pointer", whiteSpace: "nowrap", touchAction: "manipulation",
+        }}
+      >
+        🏋 {weight != null ? `${weight} kg` : "Add weight"}
+      </button>
+      {open && (
+        <WeightPopover
+          dayColor={dayColor}
+          current={weight}
+          onSave={(w) => { onChange(w); setOpen(false); }}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
 // ─── EXERCISE CARD ───────────────────────────────────────────────────────────
 
-function ExerciseCard({ ex, exIdx, dayColor, logs, onConfirm, timerVal, onSkip }: {
+function ExerciseCard({ ex, exIdx, dayColor, logs, onConfirm, weight, onWeightChange, timerVal, onSkip }: {
   ex: any; exIdx: number; dayColor: string;
   logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
+  weight: number | null; onWeightChange: (exIdx: number, weight: number | null) => void;
   timerVal: number; onSkip: (key: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -511,6 +616,9 @@ function ExerciseCard({ ex, exIdx, dayColor, logs, onConfirm, timerVal, onSkip }
           <div style={{ fontWeight: 600, fontSize: 14, color: "#111" }}>{ex.name}</div>
           <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>
             {ex.muscles} · {ex.sets} sets · {ex.reps} · {ex.rest}s rest
+          </div>
+          <div style={{ marginTop: 6 }}>
+            <WeightChip dayColor={dayColor} weight={weight} onChange={(w) => onWeightChange(exIdx, w)} />
           </div>
         </div>
         <SetPipRow ex={ex} exIdx={exIdx} dayColor={dayColor} logs={logs} onConfirm={onConfirm} />
@@ -823,14 +931,116 @@ function CalendarModal({ password, onClose }: { password: string; onClose: () =>
   );
 }
 
+// ─── INSIGHTS (weight progression graph) ─────────────────────────────────────
+
+type HistoryPoint = { date: string; weight: number | null; sets: number; reps: number };
+
+function InsightsModal({ password, onClose }: { password: string; onClose: () => void }) {
+  const exerciseOptions = DAYS.flatMap((d, dayIdx) =>
+    d.exercises.map((ex, exIdx) => ({ dayIdx, exIdx, name: ex.name, dayLabel: d.label, color: d.color }))
+  );
+  const [selected, setSelected] = useState(exerciseOptions[0]);
+  const [points, setPoints] = useState<HistoryPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/progress/history?dayIdx=${selected.dayIdx}&exIdx=${selected.exIdx}`, {
+      headers: { "x-app-password": password },
+    })
+      .then((r) => r.json())
+      .then((data) => setPoints(data.points || []))
+      .catch(() => setPoints([]))
+      .finally(() => setLoading(false));
+  }, [selected, password]);
+
+  const withWeight = points.filter((p) => p.weight != null);
+  const first = withWeight[0]?.weight ?? null;
+  const last = withWeight[withWeight.length - 1]?.weight ?? null;
+  const delta = first != null && last != null ? Math.round((last - first) * 10) / 10 : null;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ background: "#fff", borderRadius: 16, padding: 22, maxWidth: 420, width: "100%", maxHeight: "85vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ fontWeight: 700, fontSize: 16, color: "#111" }}>Progress</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#888" }}>✕</button>
+        </div>
+
+        <select
+          value={`${selected.dayIdx}-${selected.exIdx}`}
+          onChange={(e) => {
+            const [d, x] = e.target.value.split("-").map(Number);
+            const next = exerciseOptions.find((o) => o.dayIdx === d && o.exIdx === x);
+            if (next) setSelected(next);
+          }}
+          style={{ width: "100%", height: 42, borderRadius: 10, border: "1px solid #E8E8E8", padding: "0 10px", fontSize: 13, marginBottom: 16, background: "#fff", color: "#111", boxSizing: "border-box" }}
+        >
+          {DAYS.map((d, dayIdx) => (
+            <optgroup key={d.key} label={d.label}>
+              {d.exercises.map((ex, exIdx) => (
+                <option key={exIdx} value={`${dayIdx}-${exIdx}`}>{ex.name}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+
+        {withWeight.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "36px 10px", color: "#AAA", fontSize: 13 }}>
+            {loading ? "Loading…" : "No weight logged for this exercise yet — add one from its weight chip on the plan."}
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <div style={{ flex: 1, background: "#F8F8F8", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: "#111" }}>{last} kg</div>
+                <div style={{ fontSize: 9, color: "#999", fontWeight: 700, textTransform: "uppercase" }}>latest</div>
+              </div>
+              <div style={{ flex: 1, background: delta != null && delta > 0 ? "#F0FFF8" : "#F8F8F8", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: delta != null && delta > 0 ? "#0DBD8B" : "#111" }}>
+                  {delta == null ? "—" : delta > 0 ? `+${delta}` : delta} kg
+                </div>
+                <div style={{ fontSize: 9, color: "#999", fontWeight: 700, textTransform: "uppercase" }}>since first log</div>
+              </div>
+              <div style={{ flex: 1, background: "#F8F8F8", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: "#111" }}>{withWeight.length}</div>
+                <div style={{ fontSize: 9, color: "#999", fontWeight: 700, textTransform: "uppercase" }}>sessions</div>
+              </div>
+            </div>
+
+            <div style={{ width: "100%", height: 200 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={withWeight} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#AAA" }} tickFormatter={(d: string) => d.slice(5)} />
+                  <YAxis tick={{ fontSize: 10, fill: "#AAA" }} domain={["dataMin - 5", "dataMax + 5"]} />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E8E8E8" }}
+                    formatter={(value: number) => [`${value} kg`, "Weight"]}
+                  />
+                  <Line type="monotone" dataKey="weight" stroke={selected.color} strokeWidth={2.5} dot={{ r: 3, fill: selected.color }} connectNulls />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 
 export default function WorkoutApp() {
   const [dayIdx, setDayIdx] = useState(0);
   const [logs, setLogs] = useState<Record<string, Record<number, ExLogs>>>({});
   const [streak, setStreak] = useState({ current: 0, longest: 0 });
+  // dayIdx → exIdx → weight (kg). Pre-filled from the last weight logged for
+  // each exercise (server-computed), then edited freely per session from here.
+  const [weights, setWeights] = useState<Record<string, Record<string, number>>>({});
   const [showNotion, setShowNotion] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
   const { timers, startTimer, skipTimer } = useRestTimer();
 
   // Whole app is gated behind one shared password. A password already saved
@@ -858,6 +1068,7 @@ export default function WorkoutApp() {
         const data = await r.json();
         if (data.today) setLogs(data.today);
         if (data.streak) setStreak(data.streak);
+        if (data.lastWeights) setWeights(data.lastWeights);
       })
       .catch(() => {}); // offline-safe — just keep whatever's already shown
   }, []);
@@ -878,6 +1089,7 @@ export default function WorkoutApp() {
         setPassword(pw);
         if (data.today) setLogs(data.today);
         if (data.streak) setStreak(data.streak);
+        if (data.lastWeights) setWeights(data.lastWeights);
         setUnlocked(true);
       })
       .catch(() => setAuthError("Couldn't reach server — try again"))
@@ -898,19 +1110,28 @@ export default function WorkoutApp() {
   const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
   const sessionDone = day.exercises.every((ex, ei) => Object.keys(doneSetsForDay[ei] || {}).length >= ex.sets);
 
+  const handleWeightChange = (exIdx: number, weight: number | null) => {
+    setWeights((prev) => {
+      const dayWeights = { ...(prev[dayKey] || {}) };
+      if (weight == null) delete dayWeights[exIdx]; else dayWeights[exIdx] = weight;
+      return { ...prev, [dayKey]: dayWeights };
+    });
+  };
+
   const handleConfirm = (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => {
     const dk = `${dayIdx}`;
+    const weight = weights[dk]?.[exIdx] ?? null;
     setLogs((prev) => {
       const dayLogs = prev[dk] || {};
       const exLogs = dayLogs[exIdx] || {};
-      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, mode } } } };
+      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, weight, mode } } } };
     });
     startTimer(`${exIdx}`, day.exercises[exIdx].rest);
 
     fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-app-password": password || "" },
-      body: JSON.stringify({ date: todayStr(), dayIdx, exIdx, setIdx, reps, mode }),
+      body: JSON.stringify({ date: todayStr(), dayIdx, exIdx, setIdx, reps, weight, mode }),
     })
       .then(async (r) => {
         if (r.status === 401) {
@@ -990,16 +1211,26 @@ export default function WorkoutApp() {
             <div style={{ fontSize: 16, fontWeight: 700, color: "#111" }}>{day.label} — {day.type}</div>
             <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{day.sub}</div>
           </div>
-          <button
-            onClick={() => setShowNotion(true)}
-            style={{
-              padding: "6px 14px", borderRadius: 20, border: "1.5px solid #E8E8E8",
-              background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#555",
-              flexShrink: 0, marginLeft: 10,
-            }}
-          >
-            Notion ↗
-          </button>
+          <div style={{ display: "flex", gap: 6, flexShrink: 0, marginLeft: 10 }}>
+            <button
+              onClick={() => setShowInsights(true)}
+              style={{
+                padding: "6px 14px", borderRadius: 20, border: "1.5px solid #E8E8E8",
+                background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#555",
+              }}
+            >
+              📈 Progress
+            </button>
+            <button
+              onClick={() => setShowNotion(true)}
+              style={{
+                padding: "6px 14px", borderRadius: 20, border: "1.5px solid #E8E8E8",
+                background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#555",
+              }}
+            >
+              Notion ↗
+            </button>
+          </div>
         </div>
 
         {/* Phases */}
@@ -1041,6 +1272,8 @@ export default function WorkoutApp() {
           dayColor={day.color}
           logs={doneSetsForDay[ei] || {}}
           onConfirm={handleConfirm}
+          weight={weights[dayKey]?.[ei] ?? null}
+          onWeightChange={handleWeightChange}
           timerVal={getTimerVal(ei)}
           onSkip={skipTimer}
         />
@@ -1061,6 +1294,7 @@ export default function WorkoutApp() {
       {/* Notion modal */}
       {showNotion && <NotionModal day={day} onClose={() => setShowNotion(false)} />}
       {showCalendar && password && <CalendarModal password={password} onClose={() => setShowCalendar(false)} />}
+      {showInsights && password && <InsightsModal password={password} onClose={() => setShowInsights(false)} />}
 
       {/* Footer */}
       <div style={{ marginTop: 32, paddingTop: 16, borderTop: "1px solid #F0F0F0", fontSize: 11, color: "#CCC", textAlign: "center", lineHeight: 1.6 }}>
