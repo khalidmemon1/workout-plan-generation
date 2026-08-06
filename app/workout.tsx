@@ -874,7 +874,7 @@ function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onW
         .info-btn { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-dim); font-size: 14px; cursor: pointer; }
         .target-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
         .target-chip { font-size: 11.5px; font-weight: 600; color: var(--ink-dim); background: var(--surface); border: 1px solid var(--hairline); padding: 5px 10px; border-radius: 8px; }
-        .gif-preview { position: relative; display: block; width: 100%; aspect-ratio: 1; max-height: 46vh; padding: 0; margin-bottom: 16px; border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; background: #fff; cursor: pointer; touch-action: manipulation; }
+        .gif-preview { position: relative; display: block; width: 100%; flex: 1; min-height: 200px; padding: 0; margin-bottom: 16px; border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; background: #fff; cursor: pointer; touch-action: manipulation; }
         .gif-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .expand-badge { position: absolute; right: 10px; bottom: 10px; padding: 5px 10px; border-radius: 20px; background: rgba(0,0,0,0.55); color: #fff; font-size: 10.5px; font-weight: 700; backdrop-filter: blur(4px); }
         .weight-block { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
