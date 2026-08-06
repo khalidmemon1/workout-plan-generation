@@ -6,13 +6,12 @@ import './globals.css'
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
-// The workout app's UI is hand-styled light-only (hardcoded hex colors, no
-// dark variant) — without this, phones with dark mode on (Brave/Chrome's
-// "force dark on websites") auto-invert the colors, wrecking contrast on
-// anything that isn't a saturated accent color (borders, card backgrounds,
-// the reps popover all but disappear against the inverted black page).
+// Session Mode ships real dark + light themes (see ThemeStyles in
+// workout.tsx), so both are declared here rather than forcing one — that
+// lets the browser's own dark-mode heuristics stand down (they only kick in
+// when a page doesn't declare support) instead of fighting the real design.
 export const viewport: Viewport = {
-  colorScheme: 'light',
+  colorScheme: 'dark light',
 }
 
 export const metadata: Metadata = {
