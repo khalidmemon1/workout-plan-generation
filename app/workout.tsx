@@ -37,13 +37,14 @@ const DAYS = [
     phases: ["8 min bike warm-up", "45 min strength", "12 min treadmill finisher"],
     cardio: { machine: "treadmill", mode: "steady", duration: "12–15 min", target: "8–12% incline, brisk pace", note: "Straight after lifting, glycogen is already partly used — this is when steady incline walking leans hardest on stored fat for fuel. Pace where you can still talk in short sentences, not a jog." },
     exercises: [
-      { name: "Smith Machine Flat Bench Press", sets: 4, reps: "8–10", rest: 90, muscles: "Chest, Front delts, Triceps", note: "Bar set at a height you can unrack without shrugging. Grip slightly wider than shoulders. Lower to mid-chest under control, press up without slamming elbows to full lockout. The fixed bar path means your only job is driving the weight — no balancing.", tip: "Because the smith rail removes stabiliser work, you can push closer to failure safely here than on a free bar. Add 2.5 kg once all 4 sets hit 10 clean reps.", link: "https://www.muscleandstrength.com/exercises/smith-machine-bench-press.html" },
-      { name: "Smith Machine Incline Bench Press (30°)", sets: 3, reps: "10–12", rest: 90, muscles: "Upper chest, Front delts", note: "Bench at 30°, not steeper — steeper turns it into a shoulder press. Bar path is vertical so keep the bench positioned so the bar lowers to your upper chest, not your neck.", tip: "Upper chest is the region that visually tightens the chest — but the fat itself only comes off through the calorie deficit your diet + these cardio finishers create, not from targeting it with reps.", link: "https://www.muscleandstrength.com/exercises/incline-bench-press.html" },
-      { name: "Cable Crossover", sets: 3, reps: "12–15", rest: 60, muscles: "Inner chest, Outer chest", note: "Set both pulleys above head height on the crossover tower. Step forward into a slight lean, soft elbow bend held constant. Sweep both handles down and together in front of your hips, squeeze 1 second, return under control.", tip: "This is your stretch-and-squeeze finisher for chest — the smith presses build strength, this builds the pump and definition.", link: "https://www.muscleandstrength.com/exercises/cable-crossover.html" },
-      { name: "Machine Shoulder Press", sets: 3, reps: "10–12", rest: 75, muscles: "All three deltoid heads, Triceps", note: "Seat height so handles start level with shoulders. Press up without shrugging — shoulders stay pressed down into the pads throughout. Stop just short of elbow lockout.", tip: "Machine path protects the rotator cuff while you build pressing strength — good choice while chest/shoulders are still adapting to gym loads.", link: "https://www.muscleandstrength.com/exercises/machine-shoulder-press.html" },
-      { name: "Cable Lateral Raise (single arm, low pulley)", sets: 3, reps: "15 each arm", rest: 45, muscles: "Lateral deltoid", note: "Stand side-on to the low pulley, handle in far hand crossing in front of body. Raise arm out to shoulder height only, 4-second controlled lowering back down.", tip: "Cables keep tension on the delt through the whole range, unlike dumbbells which go slack at the bottom — this is the better width builder of the two.", link: "https://www.muscleandstrength.com/exercises/cable-lateral-raise.html" },
-      { name: "Cable Tricep Pushdown (rope)", sets: 3, reps: "12–15", rest: 60, muscles: "All three tricep heads", note: "High pulley, rope attachment. Elbows pinned to sides the entire set — only forearms move. Push down until arms straight, split the rope ends apart at the bottom, squeeze 1 second.", tip: "If your elbows drift forward as you push, you're using shoulders to cheat the weight down — drop the pin a plate.", link: "https://www.muscleandstrength.com/exercises/triceps-pushdown.html" },
-      { name: "Cable Overhead Tricep Extension (rope)", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Face away from a low pulley, rope overhead, elbows pointing forward and pinned next to ears. Extend forward and up until arms straight, lower behind head to a deep stretch.", tip: "The long head only gets a full stretch in the overhead position — this is the one tricep move your pushdown doesn't cover.", link: "https://www.muscleandstrength.com/exercises/cable-overhead-triceps-extension.html" },
+      { name: "Smith Machine Flat Bench Press", sets: 4, reps: "8–10", rest: 90, muscles: "Chest, Front delts, Triceps", note: "Bar set at a height you can unrack without shrugging. Grip slightly wider than shoulders. Lower to mid-chest under control, press up without slamming elbows to full lockout. The fixed bar path means your only job is driving the weight — no balancing.", tip: "Because the smith rail removes stabiliser work, you can push closer to failure safely here than on a free bar. Add 2.5 kg once all 4 sets hit 10 clean reps.", link: "https://www.muscleandstrength.com/exercises/smith-machine-bench-press.html" , alts: ["Barbell Bench Press (Free Weight)", "Dumbbell Bench Press", "Lever Chest Press (Machine)"] },
+      { name: "Smith Machine Incline Bench Press (30°)", sets: 3, reps: "10–12", rest: 90, muscles: "Upper chest, Front delts", note: "Bench at 30°, not steeper — steeper turns it into a shoulder press. Bar path is vertical so keep the bench positioned so the bar lowers to your upper chest, not your neck.", tip: "Upper chest is the region that visually tightens the chest — but the fat itself only comes off through the calorie deficit your diet + these cardio finishers create, not from targeting it with reps.", link: "https://www.muscleandstrength.com/exercises/incline-bench-press.html" , alts: ["Dumbbell Incline Bench Press", "Cable Crossover", "Dumbbell Incline Fly"] },
+      { name: "Cable Crossover", sets: 3, reps: "12–15", rest: 60, muscles: "Inner chest, Outer chest", note: "Set both pulleys above head height on the crossover tower. Step forward into a slight lean, soft elbow bend held constant. Sweep both handles down and together in front of your hips, squeeze 1 second, return under control.", tip: "This is your stretch-and-squeeze finisher for chest — the smith presses build strength, this builds the pump and definition.", link: "https://www.muscleandstrength.com/exercises/cable-crossover.html" , alts: ["Dumbbell Fly", "Lever Chest Press (Machine)", "Barbell Bench Press (Free Weight)"] },
+      { name: "Machine Shoulder Press", sets: 3, reps: "10–12", rest: 75, muscles: "All three deltoid heads, Triceps", note: "Seat height so handles start level with shoulders. Press up without shrugging — shoulders stay pressed down into the pads throughout. Stop just short of elbow lockout.", tip: "Machine path protects the rotator cuff while you build pressing strength — good choice while chest/shoulders are still adapting to gym loads.", link: "https://www.muscleandstrength.com/exercises/machine-shoulder-press.html" , alts: ["Dumbbell Shoulder Press (seated)", "Cable Shoulder Press", "Barbell Seated Overhead Press"] },
+      { name: "Cable Lateral Raise (single arm, low pulley)", sets: 3, reps: "15 each arm", rest: 45, muscles: "Lateral deltoid", note: "Stand side-on to the low pulley, handle in far hand crossing in front of body. Raise arm out to shoulder height only, 4-second controlled lowering back down.", tip: "Cables keep tension on the delt through the whole range, unlike dumbbells which go slack at the bottom — this is the better width builder of the two.", link: "https://www.muscleandstrength.com/exercises/cable-lateral-raise.html" , alts: ["Dumbbell Lateral Raise", "Lever Lateral Raise (Machine)", "Cable One-Arm Lateral Raise"] },
+      { name: "Cable Tricep Pushdown (rope)", sets: 3, reps: "12–15", rest: 60, muscles: "All three tricep heads", note: "High pulley, rope attachment. Elbows pinned to sides the entire set — only forearms move. Push down until arms straight, split the rope ends apart at the bottom, squeeze 1 second.", tip: "If your elbows drift forward as you push, you're using shoulders to cheat the weight down — drop the pin a plate.", link: "https://www.muscleandstrength.com/exercises/triceps-pushdown.html" , alts: ["Dumbbell Close-Grip Press", "Close-Grip Barbell Bench Press", "Bodyweight Triceps Dip"] },
+      { name: "Cable Overhead Tricep Extension (rope)", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Face away from a low pulley, rope overhead, elbows pointing forward and pinned next to ears. Extend forward and up until arms straight, lower behind head to a deep stretch.", tip: "The long head only gets a full stretch in the overhead position — this is the one tricep move your pushdown doesn't cover.", link: "https://www.muscleandstrength.com/exercises/cable-overhead-triceps-extension.html" , alts: ["Dumbbell Seated Triceps Extension", "Barbell Lying Triceps Extension (Skull Crusher)", "Lever Overhand Triceps Dip (Machine)"] },
+      { name: "Cable Kneeling Crunch", sets: 3, reps: "15", rest: 45, muscles: "Rectus abdominis, Deep core", note: "Kneel below a high pulley with the rope behind your neck, hands loosely at your temples. Crunch down by curling your ribs toward your hips — hips stay stacked over knees, this is spine flexion, not a hip-hinge.", tip: "Push days had zero direct ab work before this — it's here specifically to keep the 'burn fat, get lean' side of the plan running every single day, not just on leg/pull days.", link: "https://www.muscleandstrength.com/exercises/cable-crunch.html" },
     ],
   },
   {
@@ -56,14 +57,15 @@ const DAYS = [
     phases: ["8 min bike warm-up", "45 min pull", "12 min cycle finisher"],
     cardio: { machine: "cycle", mode: "intervals", duration: "12–15 min", target: "1 min hard / 2 min easy, alternating", note: "Moderate-to-hard resistance on the hard minutes, easy spin on the recovery minutes. Cycling is fully seated, so it adds zero extra load to your legs the day before Legs A." },
     exercises: [
-      { name: "Rear Delt Machine Fly", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids, Middle traps", note: "Sit facing INTO the pec-deck pad (reverse-fly position), handles at chest height. Open arms wide and back, squeeze shoulder blades together 1 second at the back, return slowly.", tip: "First on the day because rear delts fatigue fast and posture-correcting muscle needs to be trained fresh, not as a tired afterthought.", link: "https://www.muscleandstrength.com/exercises/reverse-machine-fly.html" },
-      { name: "Lat Pulldown (wide grip)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Biceps, Middle back", note: "Wide overhand grip, slight lean back. Pull the bar to upper chest by driving elbows down and back, not by yanking with arms. Squeeze lats 1 second at the bottom, control the return to a full stretch.", tip: "Think 'elbows to back pockets,' not 'bar to chest.' The elbow path decides whether your lats or your biceps do the work.", link: "https://www.muscleandstrength.com/exercises/lat-pulldown.html" },
-      { name: "Seated Cable Row", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Rhomboids, Middle back, Biceps", note: "Neutral-grip handle, knees soft, chest tall. Row to your lower ribs while keeping torso still — no swinging back to add momentum. Squeeze shoulder blades together 1 second, return to a full stretch with arms extended.", tip: "If your torso is rocking to move the weight, drop the pin — the back muscles should do 100% of the pulling.", link: "https://www.muscleandstrength.com/exercises/seated-cable-rows.html" },
-      { name: "Cable Face Pull (rope, high pulley)", sets: 3, reps: "15", rest: 60, muscles: "Rear deltoids, Rotator cuff, Middle traps", note: "Rope at head height. Pull toward your face with elbows travelling high and wide, hands finishing beside your ears. Hold 1 second, return slowly.", tip: "This is rotator-cuff insurance for every heavy press you do this week — never skip it just because rear delts already got Fly work above.", link: "https://www.muscleandstrength.com/exercises/cable-face-pull.html" },
-      { name: "Preacher Curl Machine", sets: 3, reps: "10–12", rest: 75, muscles: "Biceps (short head)", note: "Chest against the pad, upper arms flat on the preacher bench, full stretch at the bottom. Curl up over 2 seconds, squeeze 1 second at top, lower over 3 seconds — no swinging is possible here, use that.", tip: "The bench physically blocks cheating with your back or shoulders. This is where your heaviest, strictest bicep work should live.", link: "https://www.muscleandstrength.com/exercises/preacher-curl.html" },
-      { name: "Seated Dumbbell Preacher Curl", sets: 3, reps: "10–12 each arm", rest: 60, muscles: "Biceps (peak)", note: "Same arm-support bench, one dumbbell, underhand grip. Rest your upper arm flat on the pad, curl up over 2 seconds, squeeze 1 second, lower over 3 — one arm at a time so each side gets full attention.", tip: "Dumbbells let you rotate the wrist slightly at the top (a small supination twist) for an extra peak squeeze a fixed machine bar can't give you — do one arm fully before switching.", link: "https://www.muscleandstrength.com/exercises/dumbbell-preacher-curl.html" },
-      { name: "Cable Rope Hammer Curl", sets: 3, reps: "12–15", rest: 60, muscles: "Brachialis, Biceps, Forearms", note: "Low pulley, rope attachment, neutral (thumbs-up) grip held throughout. Curl to shoulder height, elbows pinned to sides, 3-second controlled lowering.", tip: "The brachialis sits under the bicep and pushes it up — developing it makes your arm look thicker from the front. Standard curls barely touch it.", link: "https://www.muscleandstrength.com/exercises/cable-hammer-curl.html" },
-      { name: "Cable Woodchop (FAT ZONE)", sets: 3, reps: "12 each side", rest: 45, muscles: "Obliques, Rotational core", note: "High pulley, stand side-on. Pull the handle diagonally down across your body from high anchor side to low opposite hip, rotating through the torso, not the arms. Return slowly with control.", tip: "Power comes from torso rotation, not arms — the obliques sit directly under the love-handle area, but visible change here comes from the cardio finisher and diet, this exercise just builds the muscle shape underneath.", link: "https://www.muscleandstrength.com/exercises/cable-wood-chop.html" },
+      { name: "Rear Delt Machine Fly", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids, Middle traps", note: "Sit facing INTO the pec-deck pad (reverse-fly position), handles at chest height. Open arms wide and back, squeeze shoulder blades together 1 second at the back, return slowly.", tip: "First on the day because rear delts fatigue fast and posture-correcting muscle needs to be trained fresh, not as a tired afterthought.", link: "https://www.muscleandstrength.com/exercises/reverse-machine-fly.html" , alts: ["Barbell Rear Delt Raise", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"] },
+      { name: "Lat Pulldown (wide grip)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Biceps, Middle back", note: "Wide overhand grip, slight lean back. Pull the bar to upper chest by driving elbows down and back, not by yanking with arms. Squeeze lats 1 second at the bottom, control the return to a full stretch.", tip: "Think 'elbows to back pockets,' not 'bar to chest.' The elbow path decides whether your lats or your biceps do the work.", link: "https://www.muscleandstrength.com/exercises/lat-pulldown.html" , alts: ["Cable Lat Pulldown (Full Range)", "Bodyweight Pull-Up (neutral grip)", "Dumbbell Pullover"] },
+      { name: "Seated Cable Row", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Rhomboids, Middle back, Biceps", note: "Neutral-grip handle, knees soft, chest tall. Row to your lower ribs while keeping torso still — no swinging back to add momentum. Squeeze shoulder blades together 1 second, return to a full stretch with arms extended.", tip: "If your torso is rocking to move the weight, drop the pin — the back muscles should do 100% of the pulling.", link: "https://www.muscleandstrength.com/exercises/seated-cable-rows.html" , alts: ["Dumbbell Bent-Over Row", "Barbell Bent-Over Row", "Lever High Row (Machine)"] },
+      { name: "Cable Face Pull (rope, high pulley)", sets: 3, reps: "15", rest: 60, muscles: "Rear deltoids, Rotator cuff, Middle traps", note: "Rope at head height. Pull toward your face with elbows travelling high and wide, hands finishing beside your ears. Hold 1 second, return slowly.", tip: "This is rotator-cuff insurance for every heavy press you do this week — never skip it just because rear delts already got Fly work above.", link: "https://www.muscleandstrength.com/exercises/cable-face-pull.html" , alts: ["Dumbbell Rear Delt Raise", "Barbell Rear Delt Raise", "Rear Delt Machine Fly"] },
+      { name: "Preacher Curl Machine", sets: 3, reps: "10–12", rest: 75, muscles: "Biceps (short head)", note: "Chest against the pad, upper arms flat on the preacher bench, full stretch at the bottom. Curl up over 2 seconds, squeeze 1 second at top, lower over 3 seconds — no swinging is possible here, use that.", tip: "The bench physically blocks cheating with your back or shoulders. This is where your heaviest, strictest bicep work should live.", link: "https://www.muscleandstrength.com/exercises/preacher-curl.html" , alts: ["Barbell Preacher Curl", "Seated Dumbbell Preacher Curl", "Lever Bicep Curl (Machine)"] },
+      { name: "Seated Dumbbell Preacher Curl", sets: 3, reps: "10–12 each arm", rest: 60, muscles: "Biceps (peak)", note: "Same arm-support bench, one dumbbell, underhand grip. Rest your upper arm flat on the pad, curl up over 2 seconds, squeeze 1 second, lower over 3 — one arm at a time so each side gets full attention.", tip: "Dumbbells let you rotate the wrist slightly at the top (a small supination twist) for an extra peak squeeze a fixed machine bar can't give you — do one arm fully before switching.", link: "https://www.muscleandstrength.com/exercises/dumbbell-preacher-curl.html" , alts: ["Barbell Preacher Curl", "Preacher Curl Machine", "Dumbbell Hammer Curl"] },
+      { name: "Cable Rope Hammer Curl", sets: 3, reps: "12–15", rest: 60, muscles: "Brachialis, Biceps, Forearms", note: "Low pulley, rope attachment, neutral (thumbs-up) grip held throughout. Curl to shoulder height, elbows pinned to sides, 3-second controlled lowering.", tip: "The brachialis sits under the bicep and pushes it up — developing it makes your arm look thicker from the front. Standard curls barely touch it.", link: "https://www.muscleandstrength.com/exercises/cable-hammer-curl.html" , alts: ["Dumbbell Hammer Curl", "Barbell Curl", "Lever Bicep Curl (Machine)"] },
+      { name: "Cable Woodchop (FAT ZONE)", sets: 3, reps: "12 each side", rest: 45, muscles: "Obliques, Rotational core", note: "High pulley, stand side-on. Pull the handle diagonally down across your body from high anchor side to low opposite hip, rotating through the torso, not the arms. Return slowly with control.", tip: "Power comes from torso rotation, not arms — the obliques sit directly under the love-handle area, but visible change here comes from the cardio finisher and diet, this exercise just builds the muscle shape underneath.", link: "https://www.muscleandstrength.com/exercises/cable-wood-chop.html" , alts: ["Dumbbell Side Bend", "Cable Side Bend", "Weighted Russian Twist"] },
+      { name: "Barbell Wrist Curl (palms up, over bench)", sets: 3, reps: "15–20", rest: 45, muscles: "Forearm flexors, Grip", note: "Sit on a bench, forearms resting on your thighs, wrists hanging just past your knees, palms facing up. Let the bar roll down to your fingertips, then curl it back up using only your wrists.", tip: "Every curl and row this week already taxes your grip — this just makes sure the forearms actually get trained on purpose instead of as leftover fatigue.", link: "https://www.muscleandstrength.com/exercises/wrist-curl.html" },
     ],
   },
   {
@@ -76,13 +78,14 @@ const DAYS = [
     phases: ["10 min bike warm-up + knee prep", "40 min legs", "12 min cycle finisher"],
     cardio: { machine: "cycle", mode: "steady", duration: "12–15 min", target: "moderate resistance, steady cadence", note: "Cycling loads the knee far less than treadmill impact — use this finisher on leg days specifically so cardio never fights with knee recovery." },
     exercises: [
-      { name: "Leg Extension Machine — Controlled Partial Reps (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Light-moderate weight. Do NOT extend to a hard lockout at the top — stop 5–10° short, hold 1 second, lower over 3 seconds. This does the same job the band terminal-knee-extension did at home, but with constant resistance through the full range.", tip: "This is your knee-pain insurance — do it before anything heavy, every single leg day, even on days your knee feels fine. Skipping it because it feels 'too easy' is the mistake that lets the pain come back.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" },
-      { name: "Sled Leg Press — Knee-Safe Depth", sets: 4, reps: "10–12", rest: 90, muscles: "Quads, Glutes, Hamstrings", note: "Feet shoulder-width, mid-platform. Lower only to where your knees stay pain-free — for most people that's roughly 90°, go less if it hurts sooner. Never lock knees out fully at the top; stop 10–15° short.", tip: "Leg press is safer than a free squat for a sore knee because the fixed sled path removes side-to-side stabiliser stress, so you can control depth precisely instead of your knee having to guess.", link: "https://www.muscleandstrength.com/exercises/leg-press.html" },
-      { name: "Smith Machine Squat — Partial Depth", sets: 3, reps: "10", rest: 90, muscles: "Quads, Glutes", note: "Bar across upper traps, feet slightly forward of the bar's vertical path (the smith rail forces a straight line, so your foot position has to compensate). Squat only to a depth that stays pain-free, drive up without locking knees at the top.", tip: "If you feel any pain during the descent, stop the set and reduce depth further next set — never push through knee pain to hit a rep count.", link: "https://www.muscleandstrength.com/exercises/smith-machine-squat.html" },
-      { name: "Hip Abductor Machine", sets: 3, reps: "15", rest: 45, muscles: "Glute medius, Hip stabilisers", note: "Seated, pads on outer thighs. Push knees apart against the resistance, hold 1 second at the widest point, return under control.", tip: "Weak hip abductors let your knees cave inward under load — that inward cave is a common, fixable source of knee pain. This is one of the more direct relief exercises in the whole plan.", link: "https://www.muscleandstrength.com/exercises/hip-abductor-machine.html" },
-      { name: "Hip Adductor Machine", sets: 3, reps: "15", rest: 45, muscles: "Inner thigh, Hip stabilisers", note: "Seated, pads on inner thighs, start with knees apart. Squeeze knees together against the resistance, hold 1 second, return under control.", tip: "Balances the abductor work above — inner and outer hip strength together is what actually keeps the knee tracking straight over the toes.", link: "https://www.muscleandstrength.com/exercises/hip-adductor-machine.html" },
-      { name: "Standing Calf Raise Machine", sets: 3, reps: "15–20", rest: 45, muscles: "Gastrocnemius, Soleus", note: "Balls of feet on the platform edge, shoulders under the pads. Lower heels to a full stretch below the platform, rise fully onto toes, 2 seconds each way, no bouncing.", tip: "Strong calves absorb ground impact on every step — building them reduces the load that reaches your knee when you walk.", link: "https://www.muscleandstrength.com/exercises/standing-calf-raise.html" },
-      { name: "Cable Crunch (FAT ZONE)", sets: 3, reps: "15", rest: 45, muscles: "Rectus abdominis, Deep core", note: "Kneel facing a high pulley with rope behind your head. Curl your ribs down toward your hips by flexing the spine — hips stay still, this is not a hip-hinge movement. Squeeze 1 second, return under control.", tip: "Ab work does not remove belly fat directly — it builds the muscle that shows once diet and the cardio finishers bring body fat down.", link: "https://www.muscleandstrength.com/exercises/cable-crunch.html" },
+      { name: "Leg Extension Machine — Controlled Partial Reps (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Light-moderate weight. Do NOT extend to a hard lockout at the top — stop 5–10° short, hold 1 second, lower over 3 seconds. This does the same job the band terminal-knee-extension did at home, but with constant resistance through the full range.", tip: "This is your knee-pain insurance — do it before anything heavy, every single leg day, even on days your knee feels fine. Skipping it because it feels 'too easy' is the mistake that lets the pain come back.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" , alts: ["Smith Machine Squat — Partial Depth", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"] },
+      { name: "Sled Leg Press — Knee-Safe Depth", sets: 4, reps: "10–12", rest: 90, muscles: "Quads, Glutes, Hamstrings", note: "Feet shoulder-width, mid-platform. Lower only to where your knees stay pain-free — for most people that's roughly 90°, go less if it hurts sooner. Never lock knees out fully at the top; stop 10–15° short.", tip: "Leg press is safer than a free squat for a sore knee because the fixed sled path removes side-to-side stabiliser stress, so you can control depth precisely instead of your knee having to guess.", link: "https://www.muscleandstrength.com/exercises/leg-press.html" , alts: ["Smith Machine Squat — Partial Depth", "Leg Extension Machine", "Dumbbell Goblet Squat (shallow)"] },
+      { name: "Smith Machine Squat — Partial Depth", sets: 3, reps: "10", rest: 90, muscles: "Quads, Glutes", note: "Bar across upper traps, feet slightly forward of the bar's vertical path (the smith rail forces a straight line, so your foot position has to compensate). Squat only to a depth that stays pain-free, drive up without locking knees at the top.", tip: "If you feel any pain during the descent, stop the set and reduce depth further next set — never push through knee pain to hit a rep count.", link: "https://www.muscleandstrength.com/exercises/smith-machine-squat.html" , alts: ["Sled Leg Press", "Dumbbell Goblet Squat (shallow)", "Leg Extension Machine"] },
+      { name: "Barbell Good Morning (light, controlled)", sets: 3, reps: "10–12", rest: 75, muscles: "Lower back (erectors), Hamstrings, Glutes", note: "Bar across your upper traps like a squat. Soft knee bend held fixed, hinge at the hips and push your glutes back, chest stays proud and back stays flat the whole way down. Stop once your torso is roughly parallel to the floor.", tip: "Wednesday had zero direct lower-back work before this — keep the weight light and the range short at first, this is priming the erectors, not a max-effort lift.", link: "https://www.muscleandstrength.com/exercises/good-morning.html" },
+      { name: "Hip Abductor Machine", sets: 3, reps: "15", rest: 45, muscles: "Glute medius, Hip stabilisers", note: "Seated, pads on outer thighs. Push knees apart against the resistance, hold 1 second at the widest point, return under control.", tip: "Weak hip abductors let your knees cave inward under load — that inward cave is a common, fixable source of knee pain. This is one of the more direct relief exercises in the whole plan.", link: "https://www.muscleandstrength.com/exercises/hip-abductor-machine.html" , alts: ["Side-Lying Hip Abduction", "Side Bridge Hip Abduction", "Straight Leg Outer Hip Abductor"] },
+      { name: "Hip Adductor Machine", sets: 3, reps: "15", rest: 45, muscles: "Inner thigh, Hip stabilisers", note: "Seated, pads on inner thighs, start with knees apart. Squeeze knees together against the resistance, hold 1 second, return under control.", tip: "Balances the abductor work above — inner and outer hip strength together is what actually keeps the knee tracking straight over the toes.", link: "https://www.muscleandstrength.com/exercises/hip-adductor-machine.html" , alts: ["Cable Hip Adduction", "Side-Lying Hip Adduction", "Side Plank Hip Adduction"] },
+      { name: "Standing Calf Raise Machine", sets: 3, reps: "15–20", rest: 45, muscles: "Gastrocnemius, Soleus", note: "Balls of feet on the platform edge, shoulders under the pads. Lower heels to a full stretch below the platform, rise fully onto toes, 2 seconds each way, no bouncing.", tip: "Strong calves absorb ground impact on every step — building them reduces the load that reaches your knee when you walk.", link: "https://www.muscleandstrength.com/exercises/standing-calf-raise.html" , alts: ["Dumbbell Standing Calf Raise", "Seated / Cable Calf Raise Machine", "Smith Reverse Calf Raise"] },
+      { name: "Cable Crunch (FAT ZONE)", sets: 3, reps: "15", rest: 45, muscles: "Rectus abdominis, Deep core", note: "Kneel facing a high pulley with rope behind your head. Curl your ribs down toward your hips by flexing the spine — hips stay still, this is not a hip-hinge movement. Squeeze 1 second, return under control.", tip: "Ab work does not remove belly fat directly — it builds the muscle that shows once diet and the cardio finishers bring body fat down.", link: "https://www.muscleandstrength.com/exercises/cable-crunch.html" , alts: ["Hanging Leg Raise", "Half Sit-Up", "Weighted Russian Twist"] },
     ],
   },
   {
@@ -95,13 +98,14 @@ const DAYS = [
     phases: ["8 min bike warm-up", "45 min push", "12 min treadmill finisher"],
     cardio: { machine: "treadmill", mode: "intervals", duration: "~12 min", target: "6 rounds: 30 sec fast / 90 sec walk", note: "Push the 30-second efforts hard — near a jog or fast walk on incline. Full recovery walk between. This is your one higher-intensity cardio session of the week." },
     exercises: [
-      { name: "Cable Shoulder Press", sets: 4, reps: "8–10", rest: 90, muscles: "All three deltoid heads, Triceps", note: "Trained first while shoulders are completely fresh — same logic as rear delts first on pull days. Dual low pulleys (or a single-arm alternating set-up), press straight overhead, stop just short of elbow lockout.", tip: "Cables keep tension on the delt through the whole press, unlike a machine which unloads at the top — genuinely different stimulus from Monday's machine press, not just the same lift with a new name.", link: "https://www.muscleandstrength.com/exercises/cable-shoulder-press.html" },
-      { name: "Cable One-Arm Lateral Raise", sets: 3, reps: "15 each arm", rest: 45, muscles: "Lateral deltoid", note: "Low pulley, stand side-on, handle in far hand crossing your body. Raise to shoulder height, 4-second controlled lowering, then switch arms.", tip: "Unilateral work exposes and fixes left/right delt imbalances that a bilateral raise like Monday's can hide — a real variation, not just a tempo tweak on the same set-up.", link: "https://www.muscleandstrength.com/exercises/cable-one-arm-lateral-raise.html" },
-      { name: "Barbell Bench Press (Free Weight)", sets: 4, reps: "8–10", rest: 90, muscles: "Chest, Front delts, Triceps", note: "Use the rack with safety pins/spotter arms set just below chest level. Unlike Monday's smith press, the bar isn't locked to a rail — your stabiliser muscles have to control the path, which is a stronger overall growth stimulus.", tip: "Start a plate lighter than you think on your first few weeks of free-bar pressing — the balance demand alone will make it feel harder than the smith version at the same weight.", link: "https://www.muscleandstrength.com/exercises/barbell-bench-press.html" },
-      { name: "Cable Front Raise", sets: 3, reps: "12–15", rest: 60, muscles: "Front deltoid", note: "Low pulley behind you, single handle. Raise straight out in front to shoulder height, slight bend in elbow, lower under control.", tip: "Front delts already get worked by every press — keep this one light and controlled rather than heavy, it's a finishing touch, not a main lift.", link: "https://www.muscleandstrength.com/exercises/cable-front-raise.html" },
-      { name: "Cable Crossover — Low-to-High", sets: 3, reps: "12–15", rest: 60, muscles: "Upper/outer chest", note: "Set both pulleys at the LOW position this time (opposite of Monday). Sweep handles up and across in front of your face — this angle hits the upper chest fibres Monday's version misses.", tip: "Same tower, opposite pulley height — small setup change, different part of the chest trained.", link: "https://www.muscleandstrength.com/exercises/cable-crossover.html" },
-      { name: "Close-Grip Barbell Bench Press", sets: 3, reps: "10–12", rest: 75, muscles: "Triceps, Inner chest", note: "Same bar and rack as your bench press, hands just inside shoulder-width. Lower to your lower chest, elbows tracking close to your sides rather than flaring out.", tip: "This is your compound tricep builder — heavier overall load than any cable pushdown, which is exactly what triceps need to keep growing.", link: "https://www.muscleandstrength.com/exercises/close-grip-bench-press.html" },
-      { name: "Dumbbell Seated Triceps Extension", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Sit on a bench, back straight. Hold one dumbbell with both hands, press it straight overhead. Bend elbows and lower the dumbbell behind your head, upper arms staying close to your ears, then press back up.", tip: "This is your only free-weight isolation move for triceps this week — the compound close-grip press above builds raw strength, this finishes the long head with a deep overhead stretch a cable can't quite replicate at this angle.", link: "https://www.muscleandstrength.com/exercises/seated-dumbbell-triceps-extension.html" },
+      { name: "Cable Shoulder Press", sets: 4, reps: "8–10", rest: 90, muscles: "All three deltoid heads, Triceps", note: "Trained first while shoulders are completely fresh — same logic as rear delts first on pull days. Dual low pulleys (or a single-arm alternating set-up), press straight overhead, stop just short of elbow lockout.", tip: "Cables keep tension on the delt through the whole press, unlike a machine which unloads at the top — genuinely different stimulus from Monday's machine press, not just the same lift with a new name.", link: "https://www.muscleandstrength.com/exercises/cable-shoulder-press.html" , alts: ["Machine Shoulder Press", "Dumbbell Shoulder Press (seated)", "Barbell Seated Overhead Press"] },
+      { name: "Cable One-Arm Lateral Raise", sets: 3, reps: "15 each arm", rest: 45, muscles: "Lateral deltoid", note: "Low pulley, stand side-on, handle in far hand crossing your body. Raise to shoulder height, 4-second controlled lowering, then switch arms.", tip: "Unilateral work exposes and fixes left/right delt imbalances that a bilateral raise like Monday's can hide — a real variation, not just a tempo tweak on the same set-up.", link: "https://www.muscleandstrength.com/exercises/cable-one-arm-lateral-raise.html" , alts: ["Cable Lateral Raise (bilateral)", "Dumbbell Lateral Raise", "Lever Lateral Raise (Machine)"] },
+      { name: "Barbell Bench Press (Free Weight)", sets: 4, reps: "8–10", rest: 90, muscles: "Chest, Front delts, Triceps", note: "Use the rack with safety pins/spotter arms set just below chest level. Unlike Monday's smith press, the bar isn't locked to a rail — your stabiliser muscles have to control the path, which is a stronger overall growth stimulus.", tip: "Start a plate lighter than you think on your first few weeks of free-bar pressing — the balance demand alone will make it feel harder than the smith version at the same weight.", link: "https://www.muscleandstrength.com/exercises/barbell-bench-press.html" , alts: ["Smith Machine Flat Bench Press", "Dumbbell Bench Press", "Lever Chest Press (Machine)"] },
+      { name: "Cable Front Raise", sets: 3, reps: "12–15", rest: 60, muscles: "Front deltoid", note: "Low pulley behind you, single handle. Raise straight out in front to shoulder height, slight bend in elbow, lower under control.", tip: "Front delts already get worked by every press — keep this one light and controlled rather than heavy, it's a finishing touch, not a main lift.", link: "https://www.muscleandstrength.com/exercises/cable-front-raise.html" , alts: ["Dumbbell Front Raise", "Barbell Front Raise", "Barbell Seated Overhead Press"] },
+      { name: "Cable Crossover — Low-to-High", sets: 3, reps: "12–15", rest: 60, muscles: "Upper/outer chest", note: "Set both pulleys at the LOW position this time (opposite of Monday). Sweep handles up and across in front of your face — this angle hits the upper chest fibres Monday's version misses.", tip: "Same tower, opposite pulley height — small setup change, different part of the chest trained.", link: "https://www.muscleandstrength.com/exercises/cable-crossover.html" , alts: ["Dumbbell Incline Fly", "Smith Machine Incline Bench Press", "Lever Chest Press (Machine)"] },
+      { name: "Close-Grip Barbell Bench Press", sets: 3, reps: "10–12", rest: 75, muscles: "Triceps, Inner chest", note: "Same bar and rack as your bench press, hands just inside shoulder-width. Lower to your lower chest, elbows tracking close to your sides rather than flaring out.", tip: "This is your compound tricep builder — heavier overall load than any cable pushdown, which is exactly what triceps need to keep growing.", link: "https://www.muscleandstrength.com/exercises/close-grip-bench-press.html" , alts: ["Cable Tricep Pushdown (rope)", "Dumbbell Close-Grip Press", "Bodyweight Triceps Dip"] },
+      { name: "Dumbbell Seated Triceps Extension", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Sit on a bench, back straight. Hold one dumbbell with both hands, press it straight overhead. Bend elbows and lower the dumbbell behind your head, upper arms staying close to your ears, then press back up.", tip: "This is your only free-weight isolation move for triceps this week — the compound close-grip press above builds raw strength, this finishes the long head with a deep overhead stretch a cable can't quite replicate at this angle.", link: "https://www.muscleandstrength.com/exercises/seated-dumbbell-triceps-extension.html" , alts: ["Cable Overhead Tricep Extension (rope)", "Barbell Lying Triceps Extension (Skull Crusher)", "Lever Overhand Triceps Dip (Machine)"] },
+      { name: "Weighted Russian Twist", sets: 3, reps: "15 each side", rest: 45, muscles: "Abs, Obliques, Lower back", note: "Sit with knees bent, feet flat or hovering, torso leaned back to about 45° and braced. Hold a plate or dumbbell with both hands and rotate it side to side, tapping the floor near your hip each side.", tip: "Same fat-zone logic as Monday's ab finisher — Thursday had none before this, now every day of the week hits the core.", link: "https://www.muscleandstrength.com/exercises/russian-twist.html" },
     ],
   },
   {
@@ -114,13 +118,15 @@ const DAYS = [
     phases: ["8 min bike warm-up", "45 min pull", "12 min cycle finisher"],
     cardio: { machine: "cycle", mode: "intervals", duration: "12–15 min", target: "1 min hard / 2 min easy, alternating", note: "Same protocol as Tuesday. Seated cycling adds no extra load before tomorrow's Legs B session." },
     exercises: [
-      { name: "Barbell Rear Delt Raise", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids", note: "Bent over at the hips ~45°, barbell hanging at arm's length, palms facing you. Raise the bar out and up by driving elbows high and wide until arms are level with your torso, squeeze 1 second, lower slowly.", tip: "Free-bar bent-over raise instead of Tuesday's machine fly — different balance and stabiliser demand on the same small muscle, real variation rather than a paused rep on the same machine.", link: "https://www.muscleandstrength.com/exercises/bent-over-barbell-rear-delt-raise.html" },
-      { name: "Cable Straight-Arm Pulldown", sets: 3, reps: "15", rest: 60, muscles: "Lats, Serratus", note: "High pulley, straight-bar or rope attachment, arms kept straight the whole movement. Pull down to your hips by squeezing your lats — imagine pinching a pencil in your armpits.", tip: "With arms straight, biceps physically can't help — this is pure lat isolation before the compound rows tire your arms out.", link: "https://www.muscleandstrength.com/exercises/straight-arm-pulldown.html" },
-      { name: "Cable Lat Pulldown (Full Range)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Biceps", note: "Different rig from Tuesday — a cable-stack pulldown station instead of the plate-loaded lever machine. Pull the bar to your upper chest through a deliberately full range, stretching all the way up at the top.", tip: "Same target muscle, different resistance curve — a cable stack loads the stretched position harder than a lever machine does, which the lever pulldown on Tuesday doesn't give you.", link: "https://www.muscleandstrength.com/exercises/cable-lat-pulldown.html" },
-      { name: "Lever High Row", sets: 3, reps: "10–12", rest: 90, muscles: "Upper back, Rhomboids, Rear delts", note: "Plate-loaded row machine, handles set high. Row with elbows flaring wide and high toward your ears rather than tucked to your ribs — a different pulling angle from Tuesday's seated cable row.", tip: "High row hits the upper back and rear delts harder than a standard row — back width and back thickness need different pulling angles to both grow, and this is a genuinely different machine from Tuesday's.", link: "https://www.muscleandstrength.com/exercises/lever-high-row.html" },
-      { name: "Barbell Preacher Curl", sets: 3, reps: "10–12", rest: 75, muscles: "Biceps (short head)", note: "Chest against the preacher pad, EZ or straight bar, full stretch at the bottom. Curl up in 1 second, lower over a full 4 seconds — free weight instead of Tuesday's cable stack.", tip: "Free weight on the preacher bench loads the bottom stretch differently than a cable, which keeps constant tension throughout — swapping the resistance type is what makes this a real second bicep stimulus, not just a tempo change on the same cable.", link: "https://www.muscleandstrength.com/exercises/preacher-curl.html" },
-      { name: "Cable Concentration Curl (single arm, low pulley)", sets: 3, reps: "12 each arm", rest: 75, muscles: "Bicep peak", note: "Seated, elbow braced against the inside of your thigh (not your knee), single handle on a low pulley. Curl slowly, squeeze 1 second at the top, lower over 3 seconds.", tip: "With the elbow braced, swinging is physically impossible — every rep here is pure bicep, unlike a free curl where momentum can sneak in.", link: "https://www.muscleandstrength.com/exercises/concentration-curl.html" },
-      { name: "Cable Side Bend (FAT ZONE)", sets: 3, reps: "15 each side", rest: 45, muscles: "Obliques, Quadratus lumborum", note: "Stand side-on to a low pulley, handle in the far hand. Keeping hips square and still, bend sideways toward the pulley, feel the far-side oblique stretch, return upright by contracting it.", tip: "Hips must not tilt — if they do, you're just swinging, not training obliques. These sit directly under the love-handle area, but they'll only show once overall body fat drops through diet and the cardio finishers.", link: "https://www.muscleandstrength.com/exercises/cable-side-bend.html" },
+      { name: "Barbell Rear Delt Raise", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids", note: "Bent over at the hips ~45°, barbell hanging at arm's length, palms facing you. Raise the bar out and up by driving elbows high and wide until arms are level with your torso, squeeze 1 second, lower slowly.", tip: "Free-bar bent-over raise instead of Tuesday's machine fly — different balance and stabiliser demand on the same small muscle, real variation rather than a paused rep on the same machine.", link: "https://www.muscleandstrength.com/exercises/bent-over-barbell-rear-delt-raise.html" , alts: ["Rear Delt Machine Fly", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"] },
+      { name: "Cable Straight-Arm Pulldown", sets: 3, reps: "15", rest: 60, muscles: "Lats, Serratus", note: "High pulley, straight-bar or rope attachment, arms kept straight the whole movement. Pull down to your hips by squeezing your lats — imagine pinching a pencil in your armpits.", tip: "With arms straight, biceps physically can't help — this is pure lat isolation before the compound rows tire your arms out.", link: "https://www.muscleandstrength.com/exercises/straight-arm-pulldown.html" , alts: ["Dumbbell Pullover", "Lat Pulldown (wide grip, Machine)", "Bodyweight Pull-Up (neutral grip)"] },
+      { name: "Cable Lat Pulldown (Full Range)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Biceps", note: "Different rig from Tuesday — a cable-stack pulldown station instead of the plate-loaded lever machine. Pull the bar to your upper chest through a deliberately full range, stretching all the way up at the top.", tip: "Same target muscle, different resistance curve — a cable stack loads the stretched position harder than a lever machine does, which the lever pulldown on Tuesday doesn't give you.", link: "https://www.muscleandstrength.com/exercises/cable-lat-pulldown.html" , alts: ["Lat Pulldown (wide grip, Machine)", "Bodyweight Pull-Up (neutral grip)", "Dumbbell Pullover"] },
+      { name: "Lever High Row", sets: 3, reps: "10–12", rest: 90, muscles: "Upper back, Rhomboids, Rear delts", note: "Plate-loaded row machine, handles set high. Row with elbows flaring wide and high toward your ears rather than tucked to your ribs — a different pulling angle from Tuesday's seated cable row.", tip: "High row hits the upper back and rear delts harder than a standard row — back width and back thickness need different pulling angles to both grow, and this is a genuinely different machine from Tuesday's.", link: "https://www.muscleandstrength.com/exercises/lever-high-row.html" , alts: ["Dumbbell Bent-Over Row", "Barbell Bent-Over Row", "Seated Cable Row"] },
+      { name: "Barbell Preacher Curl", sets: 3, reps: "10–12", rest: 75, muscles: "Biceps (short head)", note: "Chest against the preacher pad, EZ or straight bar, full stretch at the bottom. Curl up in 1 second, lower over a full 4 seconds — free weight instead of Tuesday's cable stack.", tip: "Free weight on the preacher bench loads the bottom stretch differently than a cable, which keeps constant tension throughout — swapping the resistance type is what makes this a real second bicep stimulus, not just a tempo change on the same cable.", link: "https://www.muscleandstrength.com/exercises/preacher-curl.html" , alts: ["Preacher Curl Machine", "Seated Dumbbell Preacher Curl", "Lever Bicep Curl (Machine)"] },
+      { name: "Cable Concentration Curl (single arm, low pulley)", sets: 3, reps: "12 each arm", rest: 75, muscles: "Bicep peak", note: "Seated, elbow braced against the inside of your thigh (not your knee), single handle on a low pulley. Curl slowly, squeeze 1 second at the top, lower over 3 seconds.", tip: "With the elbow braced, swinging is physically impossible — every rep here is pure bicep, unlike a free curl where momentum can sneak in.", link: "https://www.muscleandstrength.com/exercises/concentration-curl.html" , alts: ["Dumbbell Concentration Curl", "Barbell Curl", "Lever Bicep Curl (Machine)"] },
+      { name: "Cable Side Bend (FAT ZONE)", sets: 3, reps: "15 each side", rest: 45, muscles: "Obliques, Quadratus lumborum", note: "Stand side-on to a low pulley, handle in the far hand. Keeping hips square and still, bend sideways toward the pulley, feel the far-side oblique stretch, return upright by contracting it.", tip: "Hips must not tilt — if they do, you're just swinging, not training obliques. These sit directly under the love-handle area, but they'll only show once overall body fat drops through diet and the cardio finishers.", link: "https://www.muscleandstrength.com/exercises/cable-side-bend.html" , alts: ["Dumbbell Side Bend", "Cable Woodchop", "Weighted Russian Twist"] },
+      { name: "Dumbbell Shrugs", sets: 3, reps: "12–15", rest: 60, muscles: "Upper traps", note: "Stand holding a dumbbell in each hand at your sides. Shrug your shoulders straight up toward your ears — no rolling — hold 1 second at the top, lower under control over 2–3 seconds.", tip: "Rows and rear delt work already hit traps a little, but shrugs are the only move that trains them as the main target, not a side effect.", link: "https://www.muscleandstrength.com/exercises/dumbbell-shrug.html" },
+      { name: "Barbell Reverse Wrist Curl", sets: 3, reps: "15–20", rest: 45, muscles: "Forearm extensors, Grip", note: "Same seated set-up as Tuesday's wrist curl but palms facing down, bar resting on your fingers. Curl the bar up by lifting only the back of your hand, then lower it past neutral for a full stretch.", tip: "Curls and rows build the flexor side of the forearm — this is the opposing extensor, and skipping it is how you end up with lopsided forearm strength.", link: "https://www.muscleandstrength.com/exercises/reverse-wrist-curl.html" },
     ],
   },
   {
@@ -133,13 +139,14 @@ const DAYS = [
     phases: ["10 min bike warm-up + knee prep", "40 min legs", "12 min treadmill finisher"],
     cardio: { machine: "treadmill", mode: "steady", duration: "12–15 min", target: "8–12% incline, brisk pace", note: "Same protocol as Monday — steady incline walk to close the week's cardio volume." },
     exercises: [
-      { name: "Leg Extension Machine — Activation Sets (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Same protocol as Wednesday — light weight, stop short of lockout, controlled tempo. Non-negotiable on both leg days regardless of how the knee feels that day.", tip: "Skipping this on the days it feels fine is exactly how the pain comes back — consistency here is what builds lasting knee resilience, not intensity.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" },
-      { name: "Leg Curl Machine (lying or seated)", sets: 4, reps: "10–12", rest: 90, muscles: "Hamstrings", note: "Pad positioned just above the heel. Curl through a full range without lifting your hips off the pad, squeeze 1 second at the top, lower over 3 seconds.", tip: "Quad-dominant training (leg press, squats) without matching hamstring work creates a strength imbalance that itself stresses the knee joint — this exercise is what balances it out.", link: "https://www.muscleandstrength.com/exercises/lying-leg-curl.html" },
-      { name: "Sled Leg Press — High Foot Placement", sets: 4, reps: "10–12", rest: 90, muscles: "Glutes, Hamstrings, Quads", note: "Same machine as Wednesday, feet moved higher on the platform this time — shifts emphasis from quads toward glutes and hamstrings. Same knee-safe depth rule applies: never lock out, stop where it's pain-free.", tip: "Foot position is the easiest way to change what a leg press trains — high and wide biases posterior chain, low and narrow biases quads.", link: "https://www.muscleandstrength.com/exercises/leg-press.html" },
-      { name: "Side-Lying Hip Abduction — Burnout", sets: 3, reps: "20 each side", rest: 45, muscles: "Glute medius, Hip stabilisers", note: "Lie on your side, legs stacked and straight (or bottom knee bent for balance). Raise the top leg straight up toward the ceiling, hold 1 second at the top, lower under control without letting the hip roll back.", tip: "Bodyweight instead of Wednesday's machine — this is one of the two most directly knee-relief-focused exercises in the whole week, and doing it unloaded lets you feel (and fix) any rolling-hip cheat the machine's pad hides.", link: "https://www.muscleandstrength.com/exercises/side-lying-hip-abduction.html" },
-      { name: "Smith Machine Romanian Deadlift", sets: 3, reps: "10–12", rest: 90, muscles: "Hamstrings, Glutes, Lower back", note: "Bar in the smith rail, feet hip-width. Hinge at the hips with a soft, fixed knee bend — the bar travels straight down close to your shins as your hips push back. Drive hips forward to stand.", tip: "This is a hip-hinge, not a knee-bend movement — it loads hamstrings and glutes hard while asking almost nothing of the knee joint itself, a good compound on a day the knee needs a break from bending.", link: "https://www.muscleandstrength.com/exercises/smith-machine-romanian-deadlift.html" },
-      { name: "Seated / Cable Calf Raise Machine", sets: 3, reps: "15–20", rest: 45, muscles: "Soleus, Gastrocnemius", note: "Pads on thighs (seated machine) or handle at floor level (cable calf press). Full stretch at the bottom, full contraction at the top, 2 seconds each way.", tip: "The seated position isolates the soleus (the deep calf muscle) better than standing raises — pair it with Wednesday's standing version for full calf development.", link: "https://www.muscleandstrength.com/exercises/seated-calf-raise.html" },
-      { name: "Hanging Leg Raise (Smith Rack) — FAT ZONE", sets: 3, reps: "12–15", rest: 60, muscles: "Lower abs, Hip flexors, Deep core", note: "Hang from the smith rack's pull-up bar or a dip station. Raise knees (or straight legs if strong enough) toward your chest by curling the pelvis under, don't just swing legs up from the hips.", tip: "The curl-the-pelvis detail is what makes this an ab exercise instead of a hip-flexor swing — control the descent just as much as the raise.", link: "https://www.muscleandstrength.com/exercises/hanging-leg-raise.html" },
+      { name: "Leg Extension Machine — Activation Sets (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Same protocol as Wednesday — light weight, stop short of lockout, controlled tempo. Non-negotiable on both leg days regardless of how the knee feels that day.", tip: "Skipping this on the days it feels fine is exactly how the pain comes back — consistency here is what builds lasting knee resilience, not intensity.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" , alts: ["Sled Leg Press — High Foot Placement", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"] },
+      { name: "Leg Curl Machine (lying or seated)", sets: 4, reps: "10–12", rest: 90, muscles: "Hamstrings", note: "Pad positioned just above the heel. Curl through a full range without lifting your hips off the pad, squeeze 1 second at the top, lower over 3 seconds.", tip: "Quad-dominant training (leg press, squats) without matching hamstring work creates a strength imbalance that itself stresses the knee joint — this exercise is what balances it out.", link: "https://www.muscleandstrength.com/exercises/lying-leg-curl.html" , alts: ["Smith Machine Romanian Deadlift", "Dumbbell Romanian Deadlift", "Barbell Good Morning"] },
+      { name: "Sled Leg Press — High Foot Placement", sets: 4, reps: "10–12", rest: 90, muscles: "Glutes, Hamstrings, Quads", note: "Same machine as Wednesday, feet moved higher on the platform this time — shifts emphasis from quads toward glutes and hamstrings. Same knee-safe depth rule applies: never lock out, stop where it's pain-free.", tip: "Foot position is the easiest way to change what a leg press trains — high and wide biases posterior chain, low and narrow biases quads.", link: "https://www.muscleandstrength.com/exercises/leg-press.html" , alts: ["Smith Machine Romanian Deadlift", "Leg Extension Machine", "Dumbbell Goblet Squat (shallow)"] },
+      { name: "Side-Lying Hip Abduction — Burnout", sets: 3, reps: "20 each side", rest: 45, muscles: "Glute medius, Hip stabilisers", note: "Lie on your side, legs stacked and straight (or bottom knee bent for balance). Raise the top leg straight up toward the ceiling, hold 1 second at the top, lower under control without letting the hip roll back.", tip: "Bodyweight instead of Wednesday's machine — this is one of the two most directly knee-relief-focused exercises in the whole week, and doing it unloaded lets you feel (and fix) any rolling-hip cheat the machine's pad hides.", link: "https://www.muscleandstrength.com/exercises/side-lying-hip-abduction.html" , alts: ["Hip Abductor Machine", "Side Bridge Hip Abduction", "Straight Leg Outer Hip Abductor"] },
+      { name: "Smith Machine Romanian Deadlift", sets: 3, reps: "10–12", rest: 90, muscles: "Hamstrings, Glutes, Lower back", note: "Bar in the smith rail, feet hip-width. Hinge at the hips with a soft, fixed knee bend — the bar travels straight down close to your shins as your hips push back. Drive hips forward to stand.", tip: "This is a hip-hinge, not a knee-bend movement — it loads hamstrings and glutes hard while asking almost nothing of the knee joint itself, a good compound on a day the knee needs a break from bending.", link: "https://www.muscleandstrength.com/exercises/smith-machine-romanian-deadlift.html" , alts: ["Dumbbell Romanian Deadlift", "Barbell Romanian Deadlift", "Leg Curl Machine (lying or seated)"] },
+      { name: "Seated / Cable Calf Raise Machine", sets: 3, reps: "15–20", rest: 45, muscles: "Soleus, Gastrocnemius", note: "Pads on thighs (seated machine) or handle at floor level (cable calf press). Full stretch at the bottom, full contraction at the top, 2 seconds each way.", tip: "The seated position isolates the soleus (the deep calf muscle) better than standing raises — pair it with Wednesday's standing version for full calf development.", link: "https://www.muscleandstrength.com/exercises/seated-calf-raise.html" , alts: ["Standing Calf Raise Machine", "Dumbbell Seated Calf Raise", "Smith Reverse Calf Raise"] },
+      { name: "Hanging Leg Raise (Smith Rack) — FAT ZONE", sets: 3, reps: "12–15", rest: 60, muscles: "Lower abs, Hip flexors, Deep core", note: "Hang from the smith rack's pull-up bar or a dip station. Raise knees (or straight legs if strong enough) toward your chest by curling the pelvis under, don't just swing legs up from the hips.", tip: "The curl-the-pelvis detail is what makes this an ab exercise instead of a hip-flexor swing — control the descent just as much as the raise.", link: "https://www.muscleandstrength.com/exercises/hanging-leg-raise.html" , alts: ["Cable Crunch", "Half Sit-Up", "Lying Leg Raise (Flat Bench)"] },
+      { name: "Neck Isometric Hold (4-way, manual resistance)", sets: 2, reps: "20–30 sec each direction", rest: 30, muscles: "Neck flexors, extensors, lateral flexors", note: "Press your palm against your forehead and push your head forward into it without letting your head actually move — hold, then repeat pressing back against the palm on the back of your head, then each side against your palm above the ear.", tip: "Keep the pressure moderate, not maximal — this is a small muscle group that only needs light, consistent work to build up, not heavy loading. Last exercise of the week on purpose, low fatigue cost.", link: null },
     ],
   },
 ];
@@ -278,6 +285,15 @@ const WORKOUT_GIF_MAP: Record<string, string> = {
   "smith machine romanian deadlift": g("UfePqpx.gif"),  // "smith deadlift"
   "seated cable calf raise machine": g("bOOdeyc.gif"),  // "lever seated calf raise"
   "hanging leg raise":               g("I3tsCnC.gif"),  // "hanging leg raise"
+
+  // ABS / NECK / TRAPS / FOREARMS / LOWER BACK — added to close the gaps
+  // Push days had no ab work, and neck/traps/forearms/lower back had none.
+  "cable kneeling crunch":            g("WW95auq.gif"), // "cable kneeling crunch"
+  "weighted russian twist":           g("fZFZ704.gif"), // "weighted russian twist"
+  "barbell wrist curl":               g("SJAA2IQ.gif"), // "barbell palms up wrist curl over a bench"
+  "barbell reverse wrist curl":       g("LsZkfU6.gif"), // "barbell reverse wrist curl"
+  "dumbbell shrugs":                  g("NJzBsGJ.gif"), // "dumbbell shrug"
+  "barbell good morning":             g("XlZ4lAC.gif"), // "barbell good morning"
 };
 
 // Normalise a workout exercise name for map lookup
@@ -314,6 +330,127 @@ function findLocalGif(exerciseName: string): string | null {
   if (bestScore >= 2) return WORKOUT_GIF_MAP[bestKey];
 
   return null;
+}
+
+// ─── EXERCISE VARIATIONS ("machine occupied? switch") ────────────────────────
+// 3 real substitutes per exercise, same target muscle, different equipment —
+// curated from exercises-dataset-main (1324 real Gym Visual exercises) plus
+// exercises already elsewhere in this week's plan. Sets/reps/rest always stay
+// whatever the original slot prescribes; only the movement itself swaps.
+
+const EXERCISE_ALTS: Record<string, string[]> = {
+  "Smith Machine Flat Bench Press": ["Barbell Bench Press (Free Weight)", "Dumbbell Bench Press", "Lever Chest Press (Machine)"],
+  "Smith Machine Incline Bench Press (30°)": ["Dumbbell Incline Bench Press", "Cable Crossover", "Dumbbell Incline Fly"],
+  "Cable Crossover": ["Dumbbell Fly", "Lever Chest Press (Machine)", "Barbell Bench Press (Free Weight)"],
+  "Machine Shoulder Press": ["Dumbbell Shoulder Press (seated)", "Cable Shoulder Press", "Barbell Seated Overhead Press"],
+  "Cable Lateral Raise (single arm, low pulley)": ["Dumbbell Lateral Raise", "Lever Lateral Raise (Machine)", "Cable One-Arm Lateral Raise"],
+  "Cable Tricep Pushdown (rope)": ["Dumbbell Close-Grip Press", "Close-Grip Barbell Bench Press", "Bodyweight Triceps Dip"],
+  "Cable Overhead Tricep Extension (rope)": ["Dumbbell Seated Triceps Extension", "Barbell Lying Triceps Extension (Skull Crusher)", "Lever Overhand Triceps Dip (Machine)"],
+  "Rear Delt Machine Fly": ["Barbell Rear Delt Raise", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"],
+  "Lat Pulldown (wide grip)": ["Cable Lat Pulldown (Full Range)", "Bodyweight Pull-Up (neutral grip)", "Dumbbell Pullover"],
+  "Seated Cable Row": ["Dumbbell Bent-Over Row", "Barbell Bent-Over Row", "Lever High Row (Machine)"],
+  "Cable Face Pull (rope, high pulley)": ["Dumbbell Rear Delt Raise", "Barbell Rear Delt Raise", "Rear Delt Machine Fly"],
+  "Preacher Curl Machine": ["Barbell Preacher Curl", "Seated Dumbbell Preacher Curl", "Lever Bicep Curl (Machine)"],
+  "Seated Dumbbell Preacher Curl": ["Barbell Preacher Curl", "Preacher Curl Machine", "Dumbbell Hammer Curl"],
+  "Cable Rope Hammer Curl": ["Dumbbell Hammer Curl", "Barbell Curl", "Lever Bicep Curl (Machine)"],
+  "Cable Woodchop (FAT ZONE)": ["Dumbbell Side Bend", "Cable Side Bend", "Weighted Russian Twist"],
+  "Leg Extension Machine — Controlled Partial Reps (KNEE FIX)": ["Smith Machine Squat — Partial Depth", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"],
+  "Sled Leg Press — Knee-Safe Depth": ["Smith Machine Squat — Partial Depth", "Leg Extension Machine", "Dumbbell Goblet Squat (shallow)"],
+  "Smith Machine Squat — Partial Depth": ["Sled Leg Press", "Dumbbell Goblet Squat (shallow)", "Leg Extension Machine"],
+  "Hip Abductor Machine": ["Side-Lying Hip Abduction", "Side Bridge Hip Abduction", "Straight Leg Outer Hip Abductor"],
+  "Hip Adductor Machine": ["Cable Hip Adduction", "Side-Lying Hip Adduction", "Side Plank Hip Adduction"],
+  "Standing Calf Raise Machine": ["Dumbbell Standing Calf Raise", "Seated / Cable Calf Raise Machine", "Smith Reverse Calf Raise"],
+  "Cable Crunch (FAT ZONE)": ["Hanging Leg Raise", "Half Sit-Up", "Weighted Russian Twist"],
+  "Cable Shoulder Press": ["Machine Shoulder Press", "Dumbbell Shoulder Press (seated)", "Barbell Seated Overhead Press"],
+  "Cable One-Arm Lateral Raise": ["Cable Lateral Raise (bilateral)", "Dumbbell Lateral Raise", "Lever Lateral Raise (Machine)"],
+  "Barbell Bench Press (Free Weight)": ["Smith Machine Flat Bench Press", "Dumbbell Bench Press", "Lever Chest Press (Machine)"],
+  "Cable Front Raise": ["Dumbbell Front Raise", "Barbell Front Raise", "Barbell Seated Overhead Press"],
+  "Cable Crossover — Low-to-High": ["Dumbbell Incline Fly", "Smith Machine Incline Bench Press", "Lever Chest Press (Machine)"],
+  "Close-Grip Barbell Bench Press": ["Cable Tricep Pushdown (rope)", "Dumbbell Close-Grip Press", "Bodyweight Triceps Dip"],
+  "Dumbbell Seated Triceps Extension": ["Cable Overhead Tricep Extension (rope)", "Barbell Lying Triceps Extension (Skull Crusher)", "Lever Overhand Triceps Dip (Machine)"],
+  "Barbell Rear Delt Raise": ["Rear Delt Machine Fly", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"],
+  "Cable Straight-Arm Pulldown": ["Dumbbell Pullover", "Lat Pulldown (wide grip, Machine)", "Bodyweight Pull-Up (neutral grip)"],
+  "Cable Lat Pulldown (Full Range)": ["Lat Pulldown (wide grip, Machine)", "Bodyweight Pull-Up (neutral grip)", "Dumbbell Pullover"],
+  "Lever High Row": ["Dumbbell Bent-Over Row", "Barbell Bent-Over Row", "Seated Cable Row"],
+  "Barbell Preacher Curl": ["Preacher Curl Machine", "Seated Dumbbell Preacher Curl", "Lever Bicep Curl (Machine)"],
+  "Cable Concentration Curl (single arm, low pulley)": ["Dumbbell Concentration Curl", "Barbell Curl", "Lever Bicep Curl (Machine)"],
+  "Cable Side Bend (FAT ZONE)": ["Dumbbell Side Bend", "Cable Woodchop", "Weighted Russian Twist"],
+  "Leg Extension Machine — Activation Sets (KNEE FIX)": ["Sled Leg Press — High Foot Placement", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"],
+  "Leg Curl Machine (lying or seated)": ["Smith Machine Romanian Deadlift", "Dumbbell Romanian Deadlift", "Barbell Good Morning"],
+  "Sled Leg Press — High Foot Placement": ["Smith Machine Romanian Deadlift", "Leg Extension Machine", "Dumbbell Goblet Squat (shallow)"],
+  "Side-Lying Hip Abduction — Burnout": ["Hip Abductor Machine", "Side Bridge Hip Abduction", "Straight Leg Outer Hip Abductor"],
+  "Smith Machine Romanian Deadlift": ["Dumbbell Romanian Deadlift", "Barbell Romanian Deadlift", "Leg Curl Machine (lying or seated)"],
+  "Seated / Cable Calf Raise Machine": ["Standing Calf Raise Machine", "Dumbbell Seated Calf Raise", "Smith Reverse Calf Raise"],
+  "Hanging Leg Raise (Smith Rack) — FAT ZONE": ["Cable Crunch", "Half Sit-Up", "Lying Leg Raise (Flat Bench)"],
+};
+
+// Alts that aren't already an exercise elsewhere in the plan need their own
+// muscles/note/gif — sourced directly from exercises-dataset-main.
+type AltInfo = { muscles: string; note: string; gif: string };
+const ALT_EXERCISE_INFO: Record<string, AltInfo> = {
+  "Dumbbell Bench Press": { muscles: "Pectorals, Triceps, Shoulders", note: "Lie flat on a bench with your feet flat on the ground and your back pressed against the bench. Hold a dumbbell in each hand, with your palms facing forward and your arms extended above your chest.", gif: "/gifs/SpYC0Kp.gif" },
+  "Lever Chest Press (Machine)": { muscles: "Pectorals, Triceps, Shoulders", note: "Adjust the seat height and position yourself on the machine with your back flat against the pad. Grasp the handles with an overhand grip and position your elbows at a 90-degree angle.", gif: "/gifs/T0yTjgW.gif" },
+  "Dumbbell Incline Bench Press": { muscles: "Pectorals, Shoulders, Triceps", note: "Set up an incline bench at a 45-degree angle. Sit on the bench with your feet flat on the ground and your back pressed firmly against the bench.", gif: "/gifs/ns0SIbU.gif" },
+  "Dumbbell Incline Fly": { muscles: "Pectorals, Shoulders", note: "Set an incline bench to a 45-degree angle. Sit on the bench with a dumbbell in each hand, palms facing each other.", gif: "/gifs/ESOd5Pl.gif" },
+  "Dumbbell Fly": { muscles: "Pectorals, Shoulders", note: "Lie flat on a bench with a dumbbell in each hand, palms facing each other. Extend your arms straight up over your chest, with a slight bend in your elbows.", gif: "/gifs/yz9nUhF.gif" },
+  "Dumbbell Shoulder Press (seated)": { muscles: "Delts, Triceps, Upper Back", note: "Sit on a bench with a dumbbell in each hand, resting on your thighs. Raise the dumbbells to shoulder height, palms facing forward.", gif: "/gifs/znQUdHY.gif" },
+  "Barbell Seated Overhead Press": { muscles: "Delts, Triceps, Upper Back", note: "Sit on a bench with your back straight and feet flat on the ground. Hold the barbell with an overhand grip, slightly wider than shoulder-width apart.", gif: "/gifs/kTbSH9h.gif" },
+  "Dumbbell Lateral Raise": { muscles: "Delts, Traps", note: "Stand with your feet shoulder-width apart and hold a dumbbell in each hand, palms facing your body. Keep your back straight and engage your core.", gif: "/gifs/DsgkuIt.gif" },
+  "Lever Lateral Raise (Machine)": { muscles: "Delts, Traps, Upper Back", note: "Adjust the seat height and position yourself on the machine with your back against the pad. Grasp the handles with an overhand grip and keep your arms straight.", gif: "/gifs/dRTfGZT.gif" },
+  "Dumbbell Close-Grip Press": { muscles: "Triceps, Chest, Shoulders", note: "Sit on a flat bench with a dumbbell in each hand, resting on your thighs. Using your thighs to help raise the dumbbells, lift the dumbbells one at a time so that you can hold them in front of you at shoulder width.", gif: "/gifs/7jGOBF3.gif" },
+  "Bodyweight Triceps Dip": { muscles: "Triceps, Chest, Shoulders", note: "Sit on the edge of a bench or chair with your hands gripping the edge, fingers pointing forward. Slide your butt off the bench, supporting your weight with your hands.", gif: "/gifs/X6C6i5Y.gif" },
+  "Barbell Lying Triceps Extension (Skull Crusher)": { muscles: "Triceps, Shoulders", note: "Lie flat on a bench with your feet flat on the ground and your head at the end of the bench. Hold the barbell with an overhand grip, hands shoulder-width apart, and extend your arms straight up over your chest.", gif: "/gifs/h8LFzo9.gif" },
+  "Lever Overhand Triceps Dip (Machine)": { muscles: "Triceps, Chest, Shoulders", note: "Adjust the machine to the appropriate height and secure your body in position. Grasp the handles with an overhand grip and position your body so that your arms are fully extended.", gif: "/gifs/D5yqP2p.gif" },
+  "Dumbbell Rear Delt Raise": { muscles: "Delts, Trapezius, Rhomboids", note: "Stand with your feet shoulder-width apart and hold a dumbbell in each hand, palms facing your body. Bend your knees slightly and hinge forward at the hips, keeping your back straight.", gif: "/gifs/mu5Guxt.gif" },
+  "Bodyweight Pull-Up (neutral grip)": { muscles: "Lats, Biceps, Forearms", note: "Hang from a pull-up bar with a neutral grip (palms facing each other) and your arms fully extended. Engage your core and squeeze your shoulder blades together.", gif: "/gifs/0V2YQjW.gif" },
+  "Dumbbell Pullover": { muscles: "Pectorals, Latissimus Dorsi, Triceps", note: "Lie flat on a bench with your head at one end and your feet on the floor. Hold a dumbbell with both hands and extend your arms straight above your chest.", gif: "/gifs/9XjtHvS.gif" },
+  "Dumbbell Bent-Over Row": { muscles: "Upper Back, Biceps, Forearms", note: "Stand with your feet shoulder-width apart, knees slightly bent, and hold a dumbbell in each hand with your palms facing your body. Bend forward at the hips, keeping your back straight and your core engaged.", gif: "/gifs/BJ0Hz5L.gif" },
+  "Barbell Bent-Over Row": { muscles: "Upper Back, Biceps, Forearms", note: "Stand with your feet shoulder-width apart and knees slightly bent. Bend forward at the hips while keeping your back straight and chest up.", gif: "/gifs/eZyBC3j.gif" },
+  "Lever Bicep Curl (Machine)": { muscles: "Biceps, Forearms", note: "Adjust the seat height and position yourself on the machine with your back against the pad. Grasp the handles with an underhand grip, palms facing up, and keep your elbows close to your sides.", gif: "/gifs/q6y3OhV.gif" },
+  "Dumbbell Hammer Curl": { muscles: "Biceps, Forearms", note: "Stand up straight with a dumbbell in each hand, palms facing your torso. Keep your elbows close to your torso and rotate the palms of your hands until they are facing forward.", gif: "/gifs/slDvUAU.gif" },
+  "Barbell Curl": { muscles: "Biceps, Forearms", note: "Stand up straight with your feet shoulder-width apart and hold a barbell with an underhand grip, palms facing forward. Keep your elbows close to your torso and exhale as you curl the weights while contracting your biceps.", gif: "/gifs/25GPyDY.gif" },
+  "Dumbbell Side Bend": { muscles: "Abs, Obliques", note: "Stand up straight with your feet shoulder-width apart and hold a dumbbell in one hand, letting it hang down by your side. Keeping your back straight and your core engaged, slowly bend sideways at the waist towards the opposite side of the dumbbell, lowering the weight as far as you comfortably can.", gif: "/gifs/IpONWYv.gif" },
+  "Weighted Russian Twist": { muscles: "Abs, Obliques, Lower Back", note: "Sit on the ground with your knees bent and your feet flat on the floor. Hold a weight or medicine ball with both hands in front of your chest.", gif: "/gifs/fZFZ704.gif" },
+  "Dumbbell Goblet Squat (shallow)": { muscles: "Quads, Glutes, Hamstrings, Calves", note: "Stand with your feet shoulder-width apart, holding a dumbbell vertically against your chest with both hands. Keeping your chest up and core engaged, lower your body down into a squat position by pushing your hips back and bending your knees.", gif: "/gifs/yn8yg1r.gif" },
+  "Smith Chair Squat (wall-sit style)": { muscles: "Quads, Glutes, Hamstrings, Calves", note: "Adjust the height of the smith machine bar to a comfortable position. Stand with your feet shoulder-width apart, toes slightly turned out.", gif: "/gifs/Gu2rNJd.gif" },
+  "Side Bridge Hip Abduction": { muscles: "Abductors, Glutes, Obliques", note: "Lie on your side with your legs extended and stacked on top of each other. Prop yourself up on your forearm, keeping your elbow directly below your shoulder.", gif: "/gifs/WL4EmxJ.gif" },
+  "Straight Leg Outer Hip Abductor": { muscles: "Abductors, Glutes, Hamstrings", note: "Lie on your side with your legs straight and stacked on top of each other. Place your bottom arm under your head for support.", gif: "/gifs/mQ1tBXn.gif" },
+  "Cable Hip Adduction": { muscles: "Adductors, Glutes, Quadriceps", note: "Attach the ankle cuff to your ankle and stand facing the cable machine. Position yourself far enough away from the machine so that there is tension on the cable.", gif: "/gifs/hBGWILP.gif" },
+  "Side-Lying Hip Adduction": { muscles: "Adductors, Glutes, Hamstrings", note: "Lie on your side with your legs straight and stacked on top of each other. Place your bottom arm under your head for support.", gif: "/gifs/c8f5cSY.gif" },
+  "Side Plank Hip Adduction": { muscles: "Adductors, Obliques, Glutes", note: "Start by lying on your side with your legs extended and stacked on top of each other. Prop yourself up on your forearm, keeping your elbow directly below your shoulder.", gif: "/gifs/VO2qeJg.gif" },
+  "Dumbbell Standing Calf Raise": { muscles: "Calves, Ankles", note: "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Raise your heels off the ground as high as possible, using your calves.", gif: "/gifs/dPmaUaU.gif" },
+  "Smith Reverse Calf Raise": { muscles: "Calves, Hamstrings", note: "Adjust the smith machine bar to a height just below your shoulders. Stand facing the bar with your feet hip-width apart and toes pointing forward.", gif: "/gifs/ywaNfuh.gif" },
+  "Half Sit-Up": { muscles: "Abs, Hip Flexors", note: "Lie flat on your back with your knees bent and feet flat on the ground. Place your hands behind your head with your elbows pointing outwards.", gif: "/gifs/iQ241UP.gif" },
+  "Dumbbell Front Raise": { muscles: "Delts, Biceps, Trapezius", note: "Stand with your feet shoulder-width apart, holding a dumbbell in each hand with your palms facing your thighs. Keeping your arms straight, exhale and lift the dumbbells in front of you until they are at shoulder level.", gif: "/gifs/3eGE2JC.gif" },
+  "Barbell Front Raise": { muscles: "Delts, Biceps, Triceps", note: "Stand with your feet shoulder-width apart and hold a barbell in front of your thighs with an overhand grip. Keep your arms straight and lift the barbell forward and upward until it reaches shoulder level.", gif: "/gifs/b2Uoz54.gif" },
+  "Dumbbell Concentration Curl": { muscles: "Biceps, Forearms", note: "Sit on a bench with your legs spread apart and a dumbbell in one hand, resting your elbow on the inside of your thigh. Fully extend your arm and hold the dumbbell with an underhand grip.", gif: "/gifs/gvsWLQw.gif" },
+  "Dumbbell Romanian Deadlift": { muscles: "Glutes, Hamstrings, Lower Back", note: "Stand with your feet shoulder-width apart, holding a dumbbell in each hand with an overhand grip. Keeping your back straight and your core engaged, hinge at the hips and lower the dumbbells towards the ground, allowing your knees to bend slightly.", gif: "/gifs/rR0LJzx.gif" },
+  "Barbell Good Morning": { muscles: "Hamstrings, Lower Back", note: "Start by standing with your feet shoulder-width apart and the barbell resting on your upper back. Keeping your back straight and your core engaged, hinge forward at the hips, pushing your buttocks back as if you were trying to touch the wall behind you with your glutes.", gif: "/gifs/XlZ4lAC.gif" },
+  "Barbell Romanian Deadlift": { muscles: "Glutes, Hamstrings, Lower Back", note: "Stand with your feet shoulder-width apart and your toes pointing forward. Hold the barbell with an overhand grip, hands slightly wider than shoulder-width apart.", gif: "/gifs/wQ2c4XD.gif" },
+  "Dumbbell Seated Calf Raise": { muscles: "Calves, Hamstrings", note: "Sit on a bench or chair with your feet flat on the ground and a dumbbell resting on your thighs. Place the balls of your feet on a raised surface such as a step or block, with your heels hanging off the edge.", gif: "/gifs/r29jP7S.gif" },
+  "Lying Leg Raise (Flat Bench)": { muscles: "Abs, Hip Flexors", note: "Lie flat on a flat bench with your back pressed against it. Place your hands under your glutes for support.", gif: "/gifs/WhuFnR7.gif" },
+};
+
+// Resolve which exercise is actually active in a slot: the planned one, or a
+// switched-to alternate. Alternates that are themselves elsewhere in the plan
+// (e.g. Friday's Barbell Preacher Curl as an alt for Tuesday's) reuse that
+// exercise's real muscles/note/tip/link/gif instead of duplicating data.
+function resolveVariant(activeName: string | undefined, ex: any, day: any): any {
+  if (!activeName || activeName === ex.name) return { ...ex, gif: findLocalGif(ex.name) };
+  const norm = normaliseWorkout(activeName);
+  const matchIn = (list: any[]) => list.find((e) => {
+    const n = normaliseWorkout(e.name);
+    return n === norm || n.startsWith(norm) || norm.startsWith(n);
+  });
+  const found = matchIn(day.exercises) || matchIn(DAYS.flatMap((d: any) => d.exercises));
+  if (found) {
+    return { ...ex, name: found.name, muscles: found.muscles, note: found.note, tip: found.tip, link: found.link, gif: findLocalGif(found.name) };
+  }
+  const info = ALT_EXERCISE_INFO[activeName];
+  if (info) {
+    return { ...ex, name: activeName, muscles: info.muscles, note: info.note, tip: "", link: "", gif: info.gif };
+  }
+  return { ...ex, gif: findLocalGif(ex.name) };
 }
 
 type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" };
@@ -727,7 +864,7 @@ function RestSheet({ dayColor, seconds, total, onSkip, onAddTime }: {
 // ─── INFO SHEET (how-to / tip / gif / guide link) ────────────────────────────
 
 function InfoSheet({ ex, dayColor, onClose }: { ex: any; dayColor: string; onClose: () => void }) {
-  const gifUrl = findLocalGif(ex.name);
+  const gifUrl = ex.gif ?? findLocalGif(ex.name);
   const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handleOutside = (e: PointerEvent) => {
@@ -752,22 +889,26 @@ function InfoSheet({ ex, dayColor, onClose }: { ex: any; dayColor: string; onClo
           </div>
         )}
 
-        <a href={ex.link} target="_blank" rel="noopener noreferrer" className="guide-link" style={{ "--dc": dayColor } as any}>
-          <span className="play">▶</span>
-          <span>
-            <div className="guide-title">View exercise guide</div>
-            <div className="guide-sub">Video + images on Muscle &amp; Strength →</div>
-          </span>
-        </a>
+        {ex.link && (
+          <a href={ex.link} target="_blank" rel="noopener noreferrer" className="guide-link" style={{ "--dc": dayColor } as any}>
+            <span className="play">▶</span>
+            <span>
+              <div className="guide-title">View exercise guide</div>
+              <div className="guide-sub">Video + images on Muscle &amp; Strength →</div>
+            </span>
+          </a>
+        )}
 
         <div className="block">
           <span className="block-label">How to</span>
           {ex.note}
         </div>
-        <div className="block tip">
-          <span className="block-label">Tip</span>
-          {ex.tip}
-        </div>
+        {ex.tip && (
+          <div className="block tip">
+            <span className="block-label">Tip</span>
+            {ex.tip}
+          </div>
+        )}
       </div>
       <style jsx>{`
         .scrim { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.55); }
@@ -791,16 +932,86 @@ function InfoSheet({ ex, dayColor, onClose }: { ex: any; dayColor: string; onClo
   );
 }
 
+// ─── SWITCH SHEET (pick a same-muscle alternate) ─────────────────────────────
+
+function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
+  ex: any; day: any; activeName: string; dayColor: string;
+  onPick: (name: string | null) => void; onClose: () => void;
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleOutside = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onClose();
+    };
+    const id = window.setTimeout(() => document.addEventListener("pointerdown", handleOutside), 0);
+    return () => { window.clearTimeout(id); document.removeEventListener("pointerdown", handleOutside); };
+  }, [onClose]);
+
+  const alts = EXERCISE_ALTS[ex.name] || [];
+  const options = [
+    { name: ex.name, isPlanned: true, ...resolveVariant(undefined, ex, day) },
+    ...alts.map((name) => ({ name, isPlanned: false, ...resolveVariant(name, ex, day) })),
+  ];
+
+  return (
+    <div className="scrim">
+      <div ref={rootRef} className="sheet-card">
+        <div className="head">
+          <div>
+            <div className="title">Switch exercise</div>
+            <div className="sub">Same muscle, different equipment — sets/reps stay {ex.sets}×{ex.reps}</div>
+          </div>
+          <button className="close-btn" onClick={onClose}>✕</button>
+        </div>
+
+        {options.map((opt) => (
+          <button
+            key={opt.name}
+            className={`opt ${opt.name === activeName ? "active" : ""}`}
+            style={{ "--dc": dayColor } as any}
+            onClick={() => onPick(opt.isPlanned ? null : opt.name)}
+          >
+            {opt.gif && <img className="thumb" src={opt.gif} alt="" />}
+            <span className="opt-text">
+              <span className="opt-name">{opt.name}{opt.isPlanned && <span className="planned-badge">Planned</span>}</span>
+              <span className="opt-muscles">{opt.muscles}</span>
+            </span>
+            {opt.name === activeName && <span className="check">✓</span>}
+          </button>
+        ))}
+      </div>
+      <style jsx>{`
+        .scrim { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.55); }
+        .sheet-card { background: var(--surface); border-radius: 24px 24px 0 0; padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 480px; max-height: 82vh; overflow-y: auto; box-shadow: 0 -20px 50px rgba(0,0,0,0.4); }
+        .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+        .title { font-size: 17px; font-weight: 800; color: var(--ink); line-height: 1.25; }
+        .sub { font-size: 11.5px; color: var(--ink-faint); margin-top: 3px; }
+        .close-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--surface-2); color: var(--ink-dim); font-size: 14px; cursor: pointer; }
+        .opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 14px; padding: 10px; margin-bottom: 8px; cursor: pointer; touch-action: manipulation; }
+        .opt.active { border-color: var(--dc, var(--brass)); background: color-mix(in srgb, var(--dc, var(--brass)) 12%, var(--surface-2)); }
+        .thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: contain; background: #fff; flex-shrink: 0; }
+        .opt-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+        .opt-name { font-size: 13.5px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+        .planned-badge { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dc, var(--brass)); background: color-mix(in srgb, var(--dc, var(--brass)) 18%, transparent); padding: 2px 6px; border-radius: 6px; }
+        .opt-muscles { font-size: 11px; color: var(--ink-faint); }
+        .check { flex-shrink: 0; color: var(--dc, var(--brass)); font-weight: 800; font-size: 15px; }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── SESSION CARD (single exercise, full-bleed) ──────────────────────────────
 
-function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onWeightChange, password, isLast, allDone, onNext }: {
-  ex: any; exIdx: number; dayIdx: number; dayColor: string;
+function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight, onWeightChange, password, isLast, allDone, onNext, activeVariant, onSwitchVariant }: {
+  ex: any; exIdx: number; dayIdx: number; day: any; dayColor: string;
   logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
   weight: number | null; onWeightChange: (exIdx: number, weight: number | null) => void;
   password: string | null; isLast: boolean; allDone: boolean; onNext: () => void;
+  activeVariant?: string; onSwitchVariant: (name: string | null) => void;
 }) {
   const [showWeight, setShowWeight] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showSwitch, setShowSwitch] = useState(false);
   const [history, setHistory] = useState<number[]>([]);
 
   useEffect(() => {
@@ -815,15 +1026,19 @@ function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onW
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayIdx, exIdx]);
 
-  const gifUrl = findLocalGif(ex.name);
+  const activeEx = resolveVariant(activeVariant, ex, day);
+  const gifUrl = activeEx.gif;
+  const isSwapped = activeEx.name !== ex.name;
 
   return (
     <div className="card">
-      <div className="muscles" style={{ "--dc": dayColor } as any}>{ex.muscles}</div>
+      <div className="muscles" style={{ "--dc": dayColor } as any}>{activeEx.muscles}</div>
       <div className="title-row">
-        <h2>{ex.name}</h2>
+        <h2>{activeEx.name}</h2>
+        <button className="switch-btn" onClick={() => setShowSwitch(true)} aria-label="Switch to a different exercise">⇄</button>
         <button className="info-btn" onClick={() => setShowInfo(true)} aria-label="How to do this exercise">ⓘ</button>
       </div>
+      {isSwapped && <div className="swap-note">Swapped for <strong>{ex.name}</strong> · same {ex.sets}×{ex.reps}</div>}
       <div className="target-row">
         <span className="target-chip">{ex.sets} sets</span>
         <span className="target-chip">{ex.reps} reps</span>
@@ -832,7 +1047,7 @@ function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onW
 
       {gifUrl && (
         <button className="gif-preview" onClick={() => setShowInfo(true)} aria-label="View full exercise guide">
-          <img src={gifUrl} alt={`${ex.name} animation`} />
+          <img src={gifUrl} alt={`${activeEx.name} animation`} />
           <span className="expand-badge">⤢ Full guide</span>
         </button>
       )}
@@ -864,17 +1079,29 @@ function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onW
           onClose={() => setShowWeight(false)}
         />
       )}
-      {showInfo && <InfoSheet ex={ex} dayColor={dayColor} onClose={() => setShowInfo(false)} />}
+      {showInfo && <InfoSheet ex={activeEx} dayColor={dayColor} onClose={() => setShowInfo(false)} />}
+      {showSwitch && (
+        <SwitchSheet
+          ex={ex}
+          day={day}
+          activeName={activeEx.name}
+          dayColor={dayColor}
+          onPick={(name) => { onSwitchVariant(name); setShowSwitch(false); }}
+          onClose={() => setShowSwitch(false)}
+        />
+      )}
 
       <style jsx>{`
         .card { flex: 0 0 100%; min-width: 0; height: 100%; padding: 4px 20px 18px; display: flex; flex-direction: column; overflow-y: auto; box-sizing: border-box; }
         .muscles { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dc, var(--brass)); margin-bottom: 6px; }
         .title-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
         h2 { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; text-wrap: balance; color: var(--ink); flex: 1; }
-        .info-btn { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-dim); font-size: 14px; cursor: pointer; }
+        .info-btn, .switch-btn { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-dim); font-size: 14px; cursor: pointer; touch-action: manipulation; }
+        .swap-note { font-size: 11.5px; color: var(--ink-faint); margin: -6px 0 12px; }
+        .swap-note strong { color: var(--ink-dim); font-weight: 700; }
         .target-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
         .target-chip { font-size: 11.5px; font-weight: 600; color: var(--ink-dim); background: var(--surface); border: 1px solid var(--hairline); padding: 5px 10px; border-radius: 8px; }
-        .gif-preview { position: relative; display: block; width: 100%; flex: 1; min-height: 200px; padding: 0; margin-bottom: 16px; border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; background: #fff; cursor: pointer; touch-action: manipulation; }
+        .gif-preview { position: relative; display: block; width: 100%; flex: 1; min-height: 380px; padding: 0; margin-bottom: 16px; border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; background: #fff; cursor: pointer; touch-action: manipulation; }
         .gif-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .expand-badge { position: absolute; right: 10px; bottom: 10px; padding: 5px 10px; border-radius: 20px; background: rgba(0,0,0,0.55); color: #fff; font-size: 10.5px; font-weight: 700; backdrop-filter: blur(4px); }
         .weight-block { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -900,12 +1127,13 @@ function SessionCard({ ex, exIdx, dayIdx, dayColor, logs, onConfirm, weight, onW
 
 // ─── SESSION DECK (swipeable day view) ───────────────────────────────────────
 
-function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, password, timerVal, timerTotal, onSkipRest, onAddRestTime }: {
+function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, password, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
   day: any; dayIdx: number; logs: Record<number, ExLogs>;
   onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
   weights: Record<string, number>; onWeightChange: (exIdx: number, weight: number | null) => void;
   password: string | null;
   timerVal: number | null; timerTotal: number; onSkipRest: () => void; onAddRestTime: () => void;
+  variants: Record<string, string>; onSwitchVariant: (exIdx: number, name: string | null) => void;
 }) {
   const [current, setCurrent] = useState(0);
   const deckRef = useRef<HTMLDivElement>(null);
@@ -974,6 +1202,7 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, pa
               ex={ex}
               exIdx={i}
               dayIdx={dayIdx}
+              day={day}
               dayColor={day.color}
               logs={logs[i] || {}}
               onConfirm={onConfirm}
@@ -983,6 +1212,8 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, pa
               isLast={i === day.exercises.length - 1}
               allDone={Object.keys(logs[i] || {}).length >= ex.sets}
               onNext={() => goTo(i + 1)}
+              activeVariant={variants[`${dayIdx}-${i}`]}
+              onSwitchVariant={(name) => onSwitchVariant(i, name)}
             />
           ))}
         </div>
@@ -1694,6 +1925,10 @@ export default function WorkoutApp() {
   const [showDayPicker, setShowDayPicker] = useState(false);
   const [restFor, setRestFor] = useState<number | null>(null);
   const [restTotal, setRestTotal] = useState(0);
+  // "dayIdx-exIdx" → chosen alternate exercise name, when switched away from
+  // the planned default. Persists across days (a standing preference), not
+  // per-date like `logs`.
+  const [variants, setVariants] = useState<Record<string, string>>({});
   const { timers, startTimer, skipTimer, addTime } = useRestTimer();
 
   // Whole app is gated behind one shared password. A password already saved
@@ -1718,6 +1953,13 @@ export default function WorkoutApp() {
       .catch(() => {});
   }, []);
 
+  const loadVariants = useCallback((pw: string) => {
+    fetch(`/api/variants`, { headers: { "x-app-password": pw } })
+      .then((r) => r.json())
+      .then((data) => { if (data.map) setVariants(data.map); })
+      .catch(() => {});
+  }, []);
+
   const loadData = useCallback((pw: string) => {
     fetch(`/api/progress?date=${todayStr()}`, { headers: { "x-app-password": pw } })
       .then(async (r) => {
@@ -1734,7 +1976,8 @@ export default function WorkoutApp() {
       })
       .catch(() => {});
     loadCardioStreak(pw);
-  }, [loadCardioStreak]);
+    loadVariants(pw);
+  }, [loadCardioStreak, loadVariants]);
 
   const authenticate = useCallback((pw: string) => {
     setAuthLoading(true);
@@ -1753,10 +1996,11 @@ export default function WorkoutApp() {
         if (data.lastWeights) setWeights(data.lastWeights);
         setUnlocked(true);
         loadCardioStreak(pw);
+        loadVariants(pw);
       })
       .catch(() => setAuthError("Couldn't reach server — try again"))
       .finally(() => setAuthLoading(false));
-  }, [loadCardioStreak]);
+  }, [loadCardioStreak, loadVariants]);
 
   useEffect(() => {
     const stored = localStorage.getItem("wp_password");
@@ -1819,6 +2063,20 @@ export default function WorkoutApp() {
         if (data.streak) setStreak(data.streak);
       })
       .catch(() => {});
+  };
+
+  const switchVariant = (exIdx: number, name: string | null) => {
+    const key = `${dayIdx}-${exIdx}`;
+    setVariants((prev) => {
+      const next = { ...prev };
+      if (name) next[key] = name; else delete next[key];
+      return next;
+    });
+    fetch("/api/variants", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-app-password": password || "" },
+      body: JSON.stringify({ dayIdx, exIdx, name }),
+    }).catch(() => {});
   };
 
   const startWorkout = () => {
@@ -1929,6 +2187,8 @@ export default function WorkoutApp() {
         timerTotal={restTotal}
         onSkipRest={() => { if (restFor != null) skipTimer(`${restFor}`); setRestFor(null); }}
         onAddRestTime={() => { if (restFor != null) addTime(`${restFor}`, 15); setRestTotal((t) => t + 15); }}
+        variants={variants}
+        onSwitchVariant={switchVariant}
       />
 
       {sessionDone && (
