@@ -1038,7 +1038,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
         <button className="switch-btn" onClick={() => setShowSwitch(true)} aria-label="Switch to a different exercise">⇄</button>
         <button className="info-btn" onClick={() => setShowInfo(true)} aria-label="How to do this exercise">ⓘ</button>
       </div>
-      {isSwapped && <div className="swap-note">Swapped for <strong>{ex.name}</strong> · same {ex.sets}×{ex.reps}</div>}
+      {isSwapped && <div className="swap-note">Standing in for <strong>{ex.name}</strong> · same {ex.sets}×{ex.reps}</div>}
       <div className="target-row">
         <span className="target-chip">{ex.sets} sets</span>
         <span className="target-chip">{ex.reps} reps</span>
@@ -1145,7 +1145,11 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, pa
   const goTo = (i: number) => setCurrent(clampIdx(i));
 
   const onPointerDown = (e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest(".card > button, .card input, .card a")) return;
+    // Descendant selector (not just direct-child) — buttons nested inside
+    // wrapper divs (like .switch-btn/.info-btn inside .title-row) need the
+    // same drag-capture exemption as top-level ones like .weight-block, or
+    // the deck's setPointerCapture steals their click before it can fire.
+    if ((e.target as HTMLElement).closest(".card button, .card input, .card a")) return;
     dragRef.current = { startX: e.clientX, dragging: true, delta: 0 };
     deckRef.current?.setPointerCapture(e.pointerId);
   };
