@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 function todayStr(): string {
@@ -21,6 +22,30 @@ function parseRepsRange(reps: string): { min: number; max: number } | null {
   const single = reps.match(/\d+/);
   if (single) { const n = parseInt(single[0], 10); return { min: Math.max(1, n - 2), max: n }; }
   return null;
+}
+
+// ─── OFFLINE-FIRST SET-LOG QUEUE ──────────────────────────────────────────────
+// A gym-basement signal drops requests mid-set. Every confirmed set is queued
+// here (localStorage, survives a reload) before the network is even touched,
+// then a background loop retries until it lands — so a dropped connection
+// delays a sync instead of silently losing a logged set. Keyed by slot, so a
+// re-log of the same set before it's synced just replaces the queued value
+// instead of stacking duplicate writes.
+type QueuedSet = { date: string; dayIdx: number; exIdx: number; setIdx: number; reps: number | null; weight: number | null; mode: "hold" | "tap" };
+const OUTBOX_KEY = "wp_outbox";
+
+function readOutbox(): Record<string, QueuedSet> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(OUTBOX_KEY) || "{}"); } catch { return {}; }
+}
+function writeOutbox(box: Record<string, QueuedSet>) {
+  localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
+}
+function queueSet(entry: QueuedSet) {
+  const box = readOutbox();
+  box[`${entry.date}-${entry.dayIdx}-${entry.exIdx}-${entry.setIdx}`] = entry;
+  writeOutbox(box);
+  return box;
 }
 
 
@@ -527,8 +552,13 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
     };
   }, [onClose]);
 
-  return (
-    <div className="scrim">
+  // SessionDeck's swipe-drag exclusion check (`.closest(".card button, ...")`)
+  // walks the real DOM tree, which no longer includes this portaled content
+  // — but React's synthetic pointerdown still bubbles up the *component* tree
+  // to SessionDeck regardless of the portal, re-triggering drag-capture and
+  // eating every click inside this sheet. Stop it right here at the source.
+  return createPortal(
+    <div className="scrim" onPointerDown={(e) => e.stopPropagation()}>
       <div ref={rootRef} className="sheet-card">
         <div className="eyebrow center">Actual reps</div>
         <div className="chip-row center">
@@ -563,7 +593,8 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
         .text-input { flex: 1; min-width: 0; height: 46px; border-radius: 12px; border: 1px solid var(--hairline); background: var(--surface-2); color: var(--ink); padding: 0 14px; font-size: 16px; box-sizing: border-box; }
         .square-btn { width: 46px; height: 46px; border-radius: 12px; border: none; background: var(--dc, var(--brass)); color: var(--brass-ink); font-weight: 800; font-size: 17px; cursor: pointer; flex-shrink: 0; touch-action: manipulation; }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -728,6 +759,7 @@ function WeightSheet({ dayColor, current, history, onSave, onClose }: {
       window.clearTimeout(id);
       document.removeEventListener("pointerdown", handleOutside);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose]);
 
   const applyOffset = useCallback((v: number) => {
@@ -754,8 +786,10 @@ function WeightSheet({ dayColor, current, history, onSave, onClose }: {
 
   const displayVal = Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0$/, "").replace(/\.$/, "");
 
-  return (
-    <div className="scrim">
+  // See RepsPopover for why: SessionDeck's drag-exclusion check can't see
+  // through this portal, so pointerdown must be stopped here explicitly.
+  return createPortal(
+    <div className="scrim" onPointerDown={(e) => e.stopPropagation()}>
       <div ref={rootRef} className="sheet-card">
         <div className="num-display">{displayVal}</div>
         <div className="label">kg on the bar</div>
@@ -816,7 +850,8 @@ function WeightSheet({ dayColor, current, history, onSave, onClose }: {
         .ghost-btn { background: var(--surface-2); color: var(--ink-dim); }
         .solid-btn { flex: 2; background: var(--dc, var(--brass)); color: var(--brass-ink); }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -874,8 +909,10 @@ function InfoSheet({ ex, dayColor, onClose }: { ex: any; dayColor: string; onClo
     return () => { window.clearTimeout(id); document.removeEventListener("pointerdown", handleOutside); };
   }, [onClose]);
 
-  return (
-    <div className="scrim">
+  // See RepsPopover for why: SessionDeck's drag-exclusion check can't see
+  // through this portal, so pointerdown must be stopped here explicitly.
+  return createPortal(
+    <div className="scrim" onPointerDown={(e) => e.stopPropagation()}>
       <div ref={rootRef} className="sheet-card">
         <div className="head">
           <div className="title">{ex.name}</div>
@@ -928,7 +965,8 @@ function InfoSheet({ ex, dayColor, onClose }: { ex: any; dayColor: string; onClo
         .block-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 4px; }
         .block.tip .block-label { color: var(--brass); }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -939,13 +977,6 @@ function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
   onPick: (name: string | null) => void; onClose: () => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handleOutside = (e: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onClose();
-    };
-    const id = window.setTimeout(() => document.addEventListener("pointerdown", handleOutside), 0);
-    return () => { window.clearTimeout(id); document.removeEventListener("pointerdown", handleOutside); };
-  }, [onClose]);
 
   const alts = EXERCISE_ALTS[ex.name] || [];
   const options = [
@@ -953,8 +984,19 @@ function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
     ...alts.map((name) => ({ name, isPlanned: false, ...resolveVariant(name, ex, day) })),
   ];
 
-  return (
-    <div className="scrim">
+  useEffect(() => {
+    const handleOutside = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onClose();
+    };
+    const id = window.setTimeout(() => document.addEventListener("pointerdown", handleOutside), 0);
+    return () => { window.clearTimeout(id); document.removeEventListener("pointerdown", handleOutside); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onClose]);
+
+  // See RepsPopover for why: SessionDeck's drag-exclusion check can't see
+  // through this portal, so pointerdown must be stopped here explicitly.
+  return createPortal(
+    <div className="scrim" onPointerDown={(e) => e.stopPropagation()}>
       <div ref={rootRef} className="sheet-card">
         <div className="head">
           <div>
@@ -996,35 +1038,24 @@ function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
         .opt-muscles { font-size: 11px; color: var(--ink-faint); }
         .check { flex-shrink: 0; color: var(--dc, var(--brass)); font-weight: 800; font-size: 15px; }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
 // ─── SESSION CARD (single exercise, full-bleed) ──────────────────────────────
 
-function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight, onWeightChange, password, isLast, allDone, onNext, activeVariant, onSwitchVariant }: {
+function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight, onWeightChange, isLast, allDone, onNext, activeVariant, onSwitchVariant, history }: {
   ex: any; exIdx: number; dayIdx: number; day: any; dayColor: string;
   logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
   weight: number | null; onWeightChange: (exIdx: number, weight: number | null) => void;
-  password: string | null; isLast: boolean; allDone: boolean; onNext: () => void;
+  isLast: boolean; allDone: boolean; onNext: () => void;
   activeVariant?: string; onSwitchVariant: (name: string | null) => void;
+  history: number[];
 }) {
   const [showWeight, setShowWeight] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [showSwitch, setShowSwitch] = useState(false);
-  const [history, setHistory] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (!password) return;
-    fetch(`/api/progress/history?dayIdx=${dayIdx}&exIdx=${exIdx}`, { headers: { "x-app-password": password } })
-      .then((r) => r.json())
-      .then((data) => {
-        const pts = (data.points || []).map((p: HistoryPoint) => p.weight).filter((w: number | null): w is number => w != null);
-        setHistory(pts.slice(-6));
-      })
-      .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dayIdx, exIdx]);
 
   const activeEx = resolveVariant(activeVariant, ex, day);
   const gifUrl = activeEx.gif;
@@ -1127,11 +1158,11 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
 
 // ─── SESSION DECK (swipeable day view) ───────────────────────────────────────
 
-function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, password, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
+function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, dayHistory, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
   day: any; dayIdx: number; logs: Record<number, ExLogs>;
   onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
   weights: Record<string, number>; onWeightChange: (exIdx: number, weight: number | null) => void;
-  password: string | null;
+  dayHistory: Record<number, number[]>;
   timerVal: number | null; timerTotal: number; onSkipRest: () => void; onAddRestTime: () => void;
   variants: Record<string, string>; onSwitchVariant: (exIdx: number, name: string | null) => void;
 }) {
@@ -1212,7 +1243,7 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, pa
               onConfirm={onConfirm}
               weight={weights[i] ?? null}
               onWeightChange={onWeightChange}
-              password={password}
+              history={dayHistory[i] ?? []}
               isLast={i === day.exercises.length - 1}
               allDone={Object.keys(logs[i] || {}).length >= ex.sets}
               onNext={() => goTo(i + 1)}
@@ -1301,6 +1332,83 @@ function NotionModal({ day, onClose }) {
         .solid-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; background: var(--brass); color: var(--brass-ink); font-weight: 700; font-size: 14px; cursor: pointer; }
         .ghost-btn { padding: 10px 20px; border-radius: 10px; border: 1px solid var(--hairline); background: transparent; color: var(--ink-dim); font-size: 14px; cursor: pointer; }
         .hint { font-size: 11px; color: var(--ink-faint); line-height: 1.5; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── EXPLORE EXERCISES (browse every day, not just today's) ─────────────────
+
+function ExploreModal({ onClose }: { onClose: () => void }) {
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<{ ex: any; dayColor: string } | null>(null);
+
+  const q = query.trim().toLowerCase();
+  const groups = DAYS.map((d) => ({
+    ...d,
+    exercises: d.exercises.filter((ex: any) =>
+      !q || ex.name.toLowerCase().includes(q) || ex.muscles.toLowerCase().includes(q)
+    ),
+  })).filter((d) => d.exercises.length > 0);
+
+  return (
+    <div className="scrim">
+      <div className="modal">
+        <div className="head">
+          <div>
+            <div className="title">Explore exercises</div>
+            <div className="sub">Every day's lineup — tap one to see the how-to and gif</div>
+          </div>
+          <button className="close-btn" onClick={onClose}>✕</button>
+        </div>
+
+        <input
+          className="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name or muscle…"
+        />
+
+        <div className="list">
+          {groups.map((d) => (
+            <div key={d.key} className="day-group">
+              <div className="day-heading" style={{ "--dc": d.color } as any}>{d.label} · {d.type}</div>
+              {d.exercises.map((ex: any) => (
+                <button key={ex.name} className="ex-row" onClick={() => setSelected({ ex, dayColor: d.color })}>
+                  <span className="ex-text">
+                    <span className="ex-name">{ex.name}</span>
+                    <span className="ex-muscles">{ex.muscles}</span>
+                  </span>
+                  <span className="ex-chev">›</span>
+                </button>
+              ))}
+            </div>
+          ))}
+          {groups.length === 0 && <div className="empty">No exercises match "{query}"</div>}
+        </div>
+      </div>
+
+      {selected && (
+        <InfoSheet ex={selected.ex} dayColor={selected.dayColor} onClose={() => setSelected(null)} />
+      )}
+
+      <style jsx>{`
+        .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal { background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 20px; max-width: 480px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .title { font-weight: 700; font-size: 16px; color: var(--ink); }
+        .sub { font-size: 11.5px; color: var(--ink-dim); margin-top: 2px; }
+        .close-btn { flex-shrink: 0; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-dim); }
+        .search { height: 42px; border-radius: 12px; border: 1px solid var(--hairline); background: var(--surface-2); color: var(--ink); padding: 0 14px; font-size: 14px; box-sizing: border-box; }
+        .list { flex: 1; overflow-y: auto; min-height: 0; }
+        .day-group { margin-bottom: 14px; }
+        .day-heading { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--dc, var(--brass)); margin-bottom: 6px; padding: 0 2px; }
+        .ex-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface-2); border: 1px solid transparent; border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; touch-action: manipulation; }
+        .ex-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+        .ex-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+        .ex-muscles { font-size: 10.5px; color: var(--ink-faint); }
+        .ex-chev { flex-shrink: 0; color: var(--ink-faint); font-size: 15px; }
+        .empty { text-align: center; font-size: 12.5px; color: var(--ink-faint); padding: 30px 0; }
       `}</style>
     </div>
   );
@@ -1844,10 +1952,11 @@ function CardioInsightsModal({ password, onClose }: { password: string; onClose:
 
 // ─── HOME SCREEN ──────────────────────────────────────────────────────────────
 
-function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, onOpenCalendar, onOpenInsights, onOpenCardioInsights, onOpenNotion }: {
+function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, onOpenCalendar, onOpenInsights, onOpenCardioInsights, onOpenNotion, onOpenExplore }: {
   liftStreak: { current: number; longest: number }; cardioStreak: { current: number; longest: number };
   onStartWorkout: () => void; onStartCardio: () => void;
   onOpenCalendar: () => void; onOpenInsights: () => void; onOpenCardioInsights: () => void; onOpenNotion: () => void;
+  onOpenExplore: () => void;
 }) {
   const idx = todayDayIdx();
   const day = idx != null ? DAYS[idx] : null;
@@ -1883,6 +1992,14 @@ function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, o
         </button>
       </div>
 
+      <button className="explore-btn" onClick={onOpenExplore}>
+        <span className="explore-icon">🔍</span>
+        <span>
+          <div className="explore-title">Explore exercises</div>
+          <div className="explore-sub">Browse every day's lineup, not just today's</div>
+        </span>
+      </button>
+
       <div className="icon-row">
         <button className="icon-btn" onClick={onOpenInsights}>📈 Lifting progress</button>
         <button className="icon-btn" onClick={onOpenCardioInsights}>🏃 Cardio progress</button>
@@ -1906,6 +2023,27 @@ function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, o
         .start-sub { font-size: 12.5px; color: rgba(255,255,255,0.8); margin-top: 4px; font-weight: 600; }
         .icon-row { display: flex; gap: 8px; margin-top: 20px; }
         .icon-btn { flex: 1; height: 44px; border-radius: 14px; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-dim); font-size: 11.5px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+        .explore-btn { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--hairline); background: var(--surface); cursor: pointer; text-align: left; touch-action: manipulation; }
+        .explore-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .explore-title { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+        .explore-sub { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+      `}</style>
+    </div>
+  );
+}
+
+function ErrorToast({ message, onDismiss }: { message: string | null; onDismiss: () => void }) {
+  if (!message) return null;
+  return (
+    <div className="error-toast" onClick={onDismiss} role="alert">
+      {message}
+      <style jsx>{`
+        .error-toast {
+          position: fixed; left: 12px; right: 12px; top: calc(10px + env(safe-area-inset-top, 0px));
+          z-index: 2000; background: var(--danger, #c0392b); color: #fff; font-size: 12.5px; font-weight: 700;
+          line-height: 1.4; padding: 10px 14px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+          cursor: pointer;
+        }
       `}</style>
     </div>
   );
@@ -1922,8 +2060,14 @@ export default function WorkoutApp() {
   // dayIdx → exIdx → weight (kg). Pre-filled from the last weight logged for
   // each exercise (server-computed), then edited freely per session from here.
   const [weights, setWeights] = useState<Record<string, Record<string, number>>>({});
+  // exIdx → weight history for the currently open day, loaded once per day
+  // (was previously one fetch per exercise card, up to 9 requests per open).
+  const [dayHistory, setDayHistory] = useState<Record<number, number[]>>({});
+  // Sets still waiting to sync to the server — see the outbox helpers above.
+  const [pendingSync, setPendingSync] = useState(0);
   const [showNotion, setShowNotion] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showExplore, setShowExplore] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
   const [showCardioInsights, setShowCardioInsights] = useState(false);
   const [showDayPicker, setShowDayPicker] = useState(false);
@@ -1934,6 +2078,15 @@ export default function WorkoutApp() {
   // per-date like `logs`.
   const [variants, setVariants] = useState<Record<string, string>>({});
   const { timers, startTimer, skipTimer, addTime } = useRestTimer();
+
+  // Visible, on-device error tracking — a flaky gym-basement connection used
+  // to fail these fetches silently (caught and dropped). Now it surfaces as
+  // a toast instead, so a failure is something you can actually see and report.
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast((t) => (t === msg ? null : t)), 4500);
+  }, []);
 
   // Whole app is gated behind one shared password. A password already saved
   // on this device is trusted immediately — no "checking…" round trip before
@@ -1952,17 +2105,35 @@ export default function WorkoutApp() {
 
   const loadCardioStreak = useCallback((pw: string) => {
     fetch(`/api/cardio?date=${todayStr()}`, { headers: { "x-app-password": pw } })
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(`cardio ${r.status}`); return r.json(); })
       .then((data) => { if (data.streak) setCardioStreak(data.streak); })
-      .catch(() => {});
-  }, []);
+      .catch(() => showToast("⚠️ Cardio streak didn't load — connection issue"));
+  }, [showToast]);
 
   const loadVariants = useCallback((pw: string) => {
     fetch(`/api/variants`, { headers: { "x-app-password": pw } })
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(`variants ${r.status}`); return r.json(); })
       .then((data) => { if (data.map) setVariants(data.map); })
-      .catch(() => {});
-  }, []);
+      .catch(() => showToast("⚠️ Exercise switch options didn't load — connection issue, pull to refresh"));
+  }, [showToast]);
+
+  // Every exercise's weight-history sparkline used to be its own request,
+  // fired the instant a session opened (up to 9 at once). One request per
+  // day instead, sliced client-side per exercise below.
+  const loadDayHistory = useCallback((pw: string, di: number) => {
+    fetch(`/api/progress/day-history?dayIdx=${di}`, { headers: { "x-app-password": pw } })
+      .then((r) => { if (!r.ok) throw new Error(`day-history ${r.status}`); return r.json(); })
+      .then((data) => {
+        const byExercise: Record<string, { weight: number | null }[]> = data.byExercise || {};
+        const sliced: Record<number, number[]> = {};
+        for (const [exIdx, points] of Object.entries(byExercise)) {
+          const weights = points.map((p) => p.weight).filter((w): w is number => w != null);
+          sliced[Number(exIdx)] = weights.slice(-6);
+        }
+        setDayHistory(sliced);
+      })
+      .catch(() => showToast("⚠️ Weight history didn't load — connection issue"));
+  }, [showToast]);
 
   const loadData = useCallback((pw: string) => {
     fetch(`/api/progress?date=${todayStr()}`, { headers: { "x-app-password": pw } })
@@ -1973,15 +2144,16 @@ export default function WorkoutApp() {
           setUnlocked(false);
           return;
         }
+        if (!r.ok) throw new Error(`progress ${r.status}`);
         const data = await r.json();
         if (data.today) setLogs(data.today);
         if (data.streak) setStreak(data.streak);
         if (data.lastWeights) setWeights(data.lastWeights);
       })
-      .catch(() => {});
+      .catch(() => showToast("⚠️ Today's progress didn't load — connection issue"));
     loadCardioStreak(pw);
     loadVariants(pw);
-  }, [loadCardioStreak, loadVariants]);
+  }, [loadCardioStreak, loadVariants, showToast]);
 
   const authenticate = useCallback((pw: string) => {
     setAuthLoading(true);
@@ -2013,8 +2185,13 @@ export default function WorkoutApp() {
       setUnlocked(true);
       loadData(stored);
     }
+    setPendingSync(Object.keys(readOutbox()).length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (password) loadDayHistory(password, dayIdx);
+  }, [password, dayIdx, loadDayHistory]);
 
   const day = DAYS[dayIdx];
   const dayKey = `${dayIdx}`;
@@ -2036,6 +2213,57 @@ export default function WorkoutApp() {
     });
   };
 
+  // Drains the local outbox to the server. Safe to call repeatedly — each
+  // queued entry is keyed by slot, so retrying an already-flushed entry is a
+  // harmless no-op once it's removed from the queue.
+  const flushOutbox = useCallback(() => {
+    if (!password) return;
+    const box = readOutbox();
+    const keys = Object.keys(box);
+    setPendingSync(keys.length);
+    keys.forEach((key) => {
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-app-password": password },
+        body: JSON.stringify(box[key]),
+      })
+        .then(async (r) => {
+          if (r.status === 401) {
+            localStorage.removeItem("wp_password");
+            setPassword(null);
+            setUnlocked(false);
+            return;
+          }
+          if (!r.ok) throw new Error(`progress post ${r.status}`);
+          const data = await r.json();
+          if (data.streak) setStreak(data.streak);
+          if (data.lastWeights) setWeights(data.lastWeights);
+          const remaining = readOutbox();
+          delete remaining[key];
+          writeOutbox(remaining);
+          setPendingSync(Object.keys(remaining).length);
+        })
+        .catch(() => {
+          // Still in the outbox — the interval below (or the next `online`
+          // event) will retry it. Nothing lost, nothing to do here.
+        });
+    });
+  }, [password]);
+
+  // Retries whatever's still queued on a timer and the moment the browser
+  // regains a connection — covers both "signal drops mid-request" and
+  // "no signal at all for a while."
+  useEffect(() => {
+    if (!password) return;
+    flushOutbox();
+    const interval = window.setInterval(flushOutbox, 8000);
+    window.addEventListener("online", flushOutbox);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("online", flushOutbox);
+    };
+  }, [password, flushOutbox]);
+
   const handleConfirm = (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => {
     const dk = `${dayIdx}`;
     const weight = weights[dk]?.[exIdx] ?? null;
@@ -2051,22 +2279,9 @@ export default function WorkoutApp() {
       setRestFor(exIdx);
     }
 
-    fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-app-password": password || "" },
-      body: JSON.stringify({ date: todayStr(), dayIdx, exIdx, setIdx, reps, weight, mode }),
-    })
-      .then(async (r) => {
-        if (r.status === 401) {
-          localStorage.removeItem("wp_password");
-          setPassword(null);
-          setUnlocked(false);
-          return;
-        }
-        const data = await r.json();
-        if (data.streak) setStreak(data.streak);
-      })
-      .catch(() => {});
+    const box = queueSet({ date: todayStr(), dayIdx, exIdx, setIdx, reps, weight, mode });
+    setPendingSync(Object.keys(box).length);
+    flushOutbox();
   };
 
   const switchVariant = (exIdx: number, name: string | null) => {
@@ -2080,7 +2295,9 @@ export default function WorkoutApp() {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-app-password": password || "" },
       body: JSON.stringify({ dayIdx, exIdx, name }),
-    }).catch(() => {});
+    })
+      .then((r) => { if (!r.ok) throw new Error(`variants post ${r.status}`); })
+      .catch(() => showToast("⚠️ Switch shown here but didn't save — connection issue, it may reset next visit"));
   };
 
   const startWorkout = () => {
@@ -2098,6 +2315,7 @@ export default function WorkoutApp() {
     return (
       <div className="app-root">
         <ThemeStyles />
+        <ErrorToast message={toast} onDismiss={() => setToast(null)} />
         <CardioSession
           day={day}
           dayIdx={dayIdx}
@@ -2113,6 +2331,7 @@ export default function WorkoutApp() {
     return (
       <div className="app-root">
         <ThemeStyles />
+        <ErrorToast message={toast} onDismiss={() => setToast(null)} />
         <HomeScreen
           liftStreak={streak}
           cardioStreak={cardioStreak}
@@ -2122,6 +2341,7 @@ export default function WorkoutApp() {
           onOpenInsights={() => setShowInsights(true)}
           onOpenCardioInsights={() => setShowCardioInsights(true)}
           onOpenNotion={() => setShowNotion(true)}
+          onOpenExplore={() => setShowExplore(true)}
         />
         {showDayPicker && (
           <div className="scrim" onClick={() => setShowDayPicker(false)}>
@@ -2145,6 +2365,7 @@ export default function WorkoutApp() {
         {showCalendar && password && <CalendarModal password={password} onClose={() => setShowCalendar(false)} />}
         {showInsights && password && <InsightsModal password={password} onClose={() => setShowInsights(false)} />}
         {showCardioInsights && password && <CardioInsightsModal password={password} onClose={() => setShowCardioInsights(false)} />}
+        {showExplore && <ExploreModal onClose={() => setShowExplore(false)} />}
         <style jsx>{`
           .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
           .day-picker { background: var(--surface); border-radius: 22px 22px 0 0; padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 480px; }
@@ -2160,6 +2381,7 @@ export default function WorkoutApp() {
   return (
     <div className="shell">
       <ThemeStyles />
+      <ErrorToast message={toast} onDismiss={() => setToast(null)} />
 
       <div className="topbar">
         <div className="topbar-left">
@@ -2171,6 +2393,11 @@ export default function WorkoutApp() {
           </button>
         </div>
         <div className="topbar-actions">
+          {pendingSync > 0 && (
+            <span className="pending-chip" title="Saved on this device, syncing when signal returns">
+              ⏳ {pendingSync}
+            </span>
+          )}
           <button className="icon-btn small" onClick={() => setShowInsights(true)} aria-label="Progress graph">📈</button>
           <button className="icon-btn small" onClick={() => setShowNotion(true)} aria-label="Export to Notion">📝</button>
           <button className="icon-btn small streak" onClick={() => setShowCalendar(true)} aria-label="Calendar">
@@ -2186,7 +2413,7 @@ export default function WorkoutApp() {
         onConfirm={handleConfirm}
         weights={weights[dayKey] || {}}
         onWeightChange={handleWeightChange}
-        password={password}
+        dayHistory={dayHistory}
         timerVal={restFor != null ? (timers[`${restFor}`] ?? 0) : null}
         timerTotal={restTotal}
         onSkipRest={() => { if (restFor != null) skipTimer(`${restFor}`); setRestFor(null); }}
@@ -2239,7 +2466,8 @@ export default function WorkoutApp() {
         .icon-btn.streak { width: auto; padding: 0 10px; }
         .day-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .chev { color: var(--ink-faint); font-size: 12px; }
-        .topbar-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .topbar-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .pending-chip { display: flex; align-items: center; height: 34px; padding: 0 10px; border-radius: 20px; background: color-mix(in srgb, var(--brass) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent); color: var(--brass); font-size: 11.5px; font-weight: 700; }
         .complete-banner { flex-shrink: 0; display: flex; align-items: center; gap: 12px; margin: 0 16px calc(14px + env(safe-area-inset-bottom, 0px)); padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--good) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--good) 40%, transparent); }
         .emoji { font-size: 22px; }
         .ct { font-weight: 800; font-size: 14px; color: var(--good); }
