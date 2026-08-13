@@ -1060,6 +1060,11 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
   const activeEx = resolveVariant(activeVariant, ex, day);
   const gifUrl = activeEx.gif;
   const isSwapped = activeEx.name !== ex.name;
+  // weights state is seeded from /api/progress on load, but that fetch can
+  // still be in flight when this card first renders — history (already
+  // fetched for the sparkline) carries the same last-logged number, so fall
+  // back to it instead of flashing an empty "—" the user reads as broken.
+  const displayWeight = weight ?? (history.length ? history[history.length - 1] : null);
 
   return (
     <div className="card">
@@ -1084,9 +1089,9 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
       )}
 
       <button className="weight-block" onClick={() => setShowWeight(true)}>
-        <div className="wb-label"><span>Working weight</span><span className="edit-hint">Tap to edit ›</span></div>
+        <div className="wb-label"><span>{displayWeight != null ? "Last weight" : "Working weight"}</span><span className="edit-hint">Tap to edit ›</span></div>
         <div className="wb-num-row">
-          <span className="wb-num">{weight ?? "—"}</span><span className="wb-unit">kg</span>
+          <span className="wb-num">{displayWeight ?? "—"}</span><span className="wb-unit">kg</span>
           {history.length >= 2 && <div className="wb-spark"><Sparkline points={history} color={dayColor} /></div>}
         </div>
       </button>
@@ -1104,7 +1109,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
       {showWeight && (
         <WeightSheet
           dayColor={dayColor}
-          current={weight}
+          current={displayWeight}
           history={history}
           onSave={(w) => { onWeightChange(exIdx, w); setShowWeight(false); }}
           onClose={() => setShowWeight(false)}
