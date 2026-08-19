@@ -1739,8 +1739,8 @@ function CardioSession({ day, dayIdx, password, onFinish, onBack }: {
   const [phase, setPhase] = useState<"setup" | "running" | "done">("setup");
   const [machine, setMachine] = useState<"treadmill" | "cycle">(day.cardio?.machine ?? "treadmill");
   const [elapsed, setElapsed] = useState(0);
-  const [speed, setSpeed] = useState(5);
-  const [incline, setIncline] = useState(2);
+  const [speed, setSpeed] = useState(0);
+  const [incline, setIncline] = useState(0);
   const [resistance, setResistance] = useState(8);
   const [cadence, setCadence] = useState(70);
   const entriesRef = useRef<CardioEntry[]>([]);
