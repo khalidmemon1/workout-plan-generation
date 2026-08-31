@@ -15,6 +15,16 @@ function todayDayIdx(): number | null {
   return d === 0 ? null : d - 1;
 }
 
+// ponytail: calendar-week-number mod 5 as a stand-in for "5th week since you
+// started training" — no program-start-date is stored anywhere, so this is
+// stateless. Swap for a real start-date count if that ever gets tracked.
+function isDeloadWeek(): boolean {
+  const d = new Date();
+  const jan4 = new Date(d.getFullYear(), 0, 4);
+  const week = Math.ceil(((+d - +jan4) / 86400000 + jan4.getDay() + 1) / 7);
+  return week % 5 === 0;
+}
+
 // Pulls a rep target out of strings like "8–10", "12 each side", "45–60 sec".
 function parseRepsRange(reps: string): { min: number; max: number } | null {
   const range = reps.match(/(\d+)\s*[–\-—]\s*(\d+)/);
@@ -31,7 +41,8 @@ function parseRepsRange(reps: string): { min: number; max: number } | null {
 // delays a sync instead of silently losing a logged set. Keyed by slot, so a
 // re-log of the same set before it's synced just replaces the queued value
 // instead of stacking duplicate writes.
-type QueuedSet = { date: string; dayIdx: number; exIdx: number; setIdx: number; reps: number | null; weight: number | null; mode: "hold" | "tap"; exercise: string };
+type Effort = { value: number; scale: "RIR" | "RPE" };
+type QueuedSet = { date: string; dayIdx: number; exIdx: number; setIdx: number; reps: number | null; weight: number | null; mode: "hold" | "tap" | "voice"; exercise: string; effort?: Effort | null };
 const OUTBOX_KEY = "wp_outbox";
 
 function readOutbox(): Record<string, QueuedSet> {
@@ -59,8 +70,8 @@ const DAYS = [
     color: "#6C63FF",
     bg: "#EEF",
     sub: "Chest priority (Smith + Cable) · Shoulders · Triceps",
-    phases: ["8 min bike warm-up", "45 min strength", "12 min treadmill finisher"],
-    cardio: { machine: "treadmill", mode: "steady", duration: "12–15 min", target: "8–12% incline, brisk pace", note: "Straight after lifting, glycogen is already partly used — this is when steady incline walking leans hardest on stored fat for fuel. Pace where you can still talk in short sentences, not a jog." },
+    phases: ["5 min bike warm-up", "45 min strength", "7 min treadmill finisher"],
+    cardio: { machine: "treadmill", mode: "steady", duration: "6–8 min", target: "8–12% incline, brisk pace", note: "Straight after lifting, glycogen is already partly used — this is when steady incline walking leans hardest on stored fat for fuel. Pace where you can still talk in short sentences, not a jog." },
     exercises: [
       { name: "Smith Machine Flat Bench Press", sets: 4, reps: "8–10", rest: 90, muscles: "Chest, Front delts, Triceps", note: "Bar set at a height you can unrack without shrugging. Grip slightly wider than shoulders. Lower to mid-chest under control, press up without slamming elbows to full lockout. The fixed bar path means your only job is driving the weight — no balancing.", tip: "Because the smith rail removes stabiliser work, you can push closer to failure safely here than on a free bar. Add 2.5 kg once all 4 sets hit 10 clean reps.", avoid: "Don't bounce the bar off your chest for momentum, and don't flare elbows out to 90° — keep them at roughly a 45° angle to your torso or the front delts and shoulder joint take over from the chest.", link: "https://www.muscleandstrength.com/exercises/smith-machine-bench-press.html" , alts: ["Barbell Bench Press (Free Weight)", "Dumbbell Bench Press", "Lever Chest Press (Machine)"] },
       { name: "Smith Machine Incline Bench Press (30°)", sets: 3, reps: "10–12", rest: 90, muscles: "Upper chest, Front delts", note: "Bench at 30°, not steeper — steeper turns it into a shoulder press. Bar path is vertical so keep the bench positioned so the bar lowers to your upper chest, not your neck.", tip: "Upper chest is the region that visually tightens the chest — but the fat itself only comes off through the calorie deficit your diet + these cardio finishers create, not from targeting it with reps.", avoid: "Don't set the bench past 30–45° — the steeper it goes, the more this just becomes a worse shoulder press. Lowering the bar to your neck instead of upper chest is the other common mistake.", link: "https://www.muscleandstrength.com/exercises/incline-bench-press.html" , alts: ["Dumbbell Incline Bench Press", "Cable Crossover", "Dumbbell Incline Fly"] },
@@ -79,8 +90,8 @@ const DAYS = [
     color: "#0DBD8B",
     bg: "#E1F5EE",
     sub: "Rear Delts FIRST → Lat Width → Biceps",
-    phases: ["8 min bike warm-up", "45 min pull", "12 min cycle finisher"],
-    cardio: { machine: "cycle", mode: "intervals", duration: "12–15 min", target: "1 min hard / 2 min easy, alternating", note: "Moderate-to-hard resistance on the hard minutes, easy spin on the recovery minutes. Cycling is fully seated, so it adds zero extra load to your legs the day before Legs A." },
+    phases: ["5 min bike warm-up", "45 min pull", "7 min cycle finisher"],
+    cardio: { machine: "cycle", mode: "intervals", duration: "6–8 min", target: "1 min hard / 2 min easy, alternating", note: "Moderate-to-hard resistance on the hard minutes, easy spin on the recovery minutes. Cycling is fully seated, so it adds zero extra load to your legs the day before Legs A." },
     exercises: [
       { name: "Rear Delt Machine Fly", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids, Middle traps", note: "Sit facing INTO the pec-deck pad (reverse-fly position), handles at chest height. Open arms wide and back, squeeze shoulder blades together 1 second at the back, return slowly.", tip: "First on the day because rear delts fatigue fast and posture-correcting muscle needs to be trained fresh, not as a tired afterthought.", avoid: "Don't yank the handles back fast for momentum — a slow, controlled squeeze is what trains the small rear delt, speed just lets bigger back muscles take over.", link: "https://www.muscleandstrength.com/exercises/reverse-machine-fly.html" , alts: ["Barbell Rear Delt Raise", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"] },
       { name: "Lat Pulldown (wide grip)", sets: 4, reps: "10–12", rest: 90, muscles: "Lats, Biceps, Middle back", note: "Wide overhand grip, slight lean back. Pull the bar to upper chest by driving elbows down and back, not by yanking with arms. Squeeze lats 1 second at the bottom, control the return to a full stretch.", tip: "Think 'elbows to back pockets,' not 'bar to chest.' The elbow path decides whether your lats or your biceps do the work.", avoid: "Don't lean back past a slight angle or pull the bar behind your neck — both put the shoulder in a bad position and turn the pull into a bicep-dominant yank instead of a lat squeeze.", link: "https://www.muscleandstrength.com/exercises/lat-pulldown.html" , alts: ["Cable Lat Pulldown (Full Range)", "Bodyweight Pull-Up (neutral grip)", "Dumbbell Pullover"] },
@@ -100,13 +111,13 @@ const DAYS = [
     color: "#FF6B35",
     bg: "#FAECE7",
     sub: "Knee-Prehab FIRST → Quads → Hip Stability",
-    phases: ["10 min bike warm-up + knee prep", "40 min legs", "12 min cycle finisher"],
-    cardio: { machine: "cycle", mode: "steady", duration: "12–15 min", target: "moderate resistance, steady cadence", note: "Cycling loads the knee far less than treadmill impact — use this finisher on leg days specifically so cardio never fights with knee recovery." },
+    phases: ["7 min bike warm-up + knee prep", "40 min legs", "7 min cycle finisher"],
+    cardio: { machine: "cycle", mode: "steady", duration: "6–8 min", target: "moderate resistance, steady cadence", note: "Cycling loads the knee far less than treadmill impact — use this finisher on leg days specifically so cardio never fights with knee recovery." },
     exercises: [
       { name: "Leg Extension Machine — Controlled Partial Reps (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Light-moderate weight. Do NOT extend to a hard lockout at the top — stop 5–10° short, hold 1 second, lower over 3 seconds. This does the same job the band terminal-knee-extension did at home, but with constant resistance through the full range.", tip: "This is your knee-pain insurance — do it before anything heavy, every single leg day, even on days your knee feels fine. Skipping it because it feels 'too easy' is the mistake that lets the pain come back.", avoid: "Don't extend to a hard lockout and don't use momentum to kick the weight up — both defeat the point of this being a gentle, controlled activation exercise rather than a max-effort quad builder.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" , alts: ["Smith Machine Squat — Partial Depth", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"] },
       { name: "Sled Leg Press — Knee-Safe Depth", sets: 4, reps: "10–12", rest: 90, muscles: "Quads, Glutes, Hamstrings", note: "Feet shoulder-width, mid-platform. Lower only to where your knees stay pain-free — for most people that's roughly 90°, go less if it hurts sooner. Never lock knees out fully at the top; stop 10–15° short.", tip: "Leg press is safer than a free squat for a sore knee because the fixed sled path removes side-to-side stabiliser stress, so you can control depth precisely instead of your knee having to guess.", avoid: "Don't lock your knees out at the top or let them cave inward as you push — locking transfers the load onto the joint instead of the muscle, and caving is the exact pattern this whole day is trying to fix.", link: "https://www.muscleandstrength.com/exercises/leg-press.html" , alts: ["Smith Machine Squat — Partial Depth", "Leg Extension Machine", "Dumbbell Goblet Squat (shallow)"] },
       { name: "Smith Machine Squat — Partial Depth", sets: 3, reps: "10", rest: 90, muscles: "Quads, Glutes", note: "Bar across upper traps, feet slightly forward of the bar's vertical path (the smith rail forces a straight line, so your foot position has to compensate). Squat only to a depth that stays pain-free, drive up without locking knees at the top.", tip: "If you feel any pain during the descent, stop the set and reduce depth further next set — never push through knee pain to hit a rep count.", avoid: "Don't push through pain to hit a target depth or rep count — the whole point of 'partial depth' is stopping wherever it stays pain-free, even if that's shallower than last session.", link: "https://www.muscleandstrength.com/exercises/smith-machine-squat.html" , alts: ["Sled Leg Press", "Dumbbell Goblet Squat (shallow)", "Leg Extension Machine"] },
-      { name: "Barbell Good Morning (light, controlled)", sets: 3, reps: "10–12", rest: 75, muscles: "Lower back (erectors), Hamstrings, Glutes", note: "Bar across your upper traps like a squat. Soft knee bend held fixed, hinge at the hips and push your glutes back, chest stays proud and back stays flat the whole way down. Stop once your torso is roughly parallel to the floor.", tip: "Wednesday had zero direct lower-back work before this — keep the weight light and the range short at first, this is priming the erectors, not a max-effort lift.", avoid: "Don't round your lower back to reach deeper, and don't go heavy while you're still learning the hinge pattern — a rounded back under load here is the single biggest injury risk in the whole plan.", link: "https://www.muscleandstrength.com/exercises/good-morning.html" },
+      { name: "Cable Pull-Through", sets: 3, reps: "10–12", rest: 75, muscles: "Lower back (erectors), Hamstrings, Glutes", note: "Face away from a low pulley, rope between your legs, feet shoulder-width, soft fixed knee bend. Hinge at the hips until you feel a full hamstring stretch, then drive your hips forward to standing, squeezing your glutes at the top.", tip: "Same hip-hinge pattern as a barbell Good Morning, but the cable pulls from between your legs instead of a bar loading your spine from above — trains the pattern without the free-bar back-rounding risk while you're still not advanced on this hinge.", avoid: "Don't round your lower back to reach further down, and don't turn it into a squat by bending your knees more — hips travel back, knees stay soft and fixed, back stays flat the whole way.", link: "https://www.muscleandstrength.com/exercises/cable-pull-through.html" , alts: ["Smith Machine Romanian Deadlift", "Dumbbell Romanian Deadlift", "Barbell Good Morning (light, controlled)"] },
       { name: "Side Bridge Hip Abduction", sets: 3, reps: "15 each side", rest: 45, muscles: "Abductors, Glutes, Obliques", note: "Lie on your side, propped up on your forearm with elbow directly under your shoulder, hips stacked and lifted into a side plank (drop to your knees for an easier version). From that braced position, lift your top leg straight up toward the ceiling, hold 1 second, lower under control.", tip: "The side-plank brace means your core and obliques work the whole set too, not just the hip — a genuinely different stimulus from Saturday's simpler side-lying version, not a repeat.", avoid: "Don't let your hips sag toward the floor or rotate forward as you lift — if the plank breaks down, drop to the easier bent-knee version rather than losing the brace to grind out reps.", alts: ["Hip Abductor Machine", "Side-Lying Hip Abduction", "Straight Leg Outer Hip Abductor"] },
       { name: "Hip Adductor Machine", sets: 3, reps: "15", rest: 45, muscles: "Inner thigh, Hip stabilisers", note: "Seated, pads on inner thighs, start with knees apart. Squeeze knees together against the resistance, hold 1 second, return under control.", tip: "Balances the abductor work above — inner and outer hip strength together is what actually keeps the knee tracking straight over the toes.", avoid: "Don't use a bouncing motion to squeeze the pads together — a controlled squeeze with a 1-second hold trains the muscle far better than fast, bouncy reps.", link: "https://www.muscleandstrength.com/exercises/hip-adductor-machine.html" , alts: ["Cable Hip Adduction", "Side-Lying Hip Adduction", "Side Plank Hip Adduction"] },
       { name: "Standing Calf Raise Machine", sets: 3, reps: "15–20", rest: 45, muscles: "Gastrocnemius, Soleus", note: "Balls of feet on the platform edge, shoulders under the pads. Lower heels to a full stretch below the platform, rise fully onto toes, 2 seconds each way, no bouncing.", tip: "Strong calves absorb ground impact on every step — building them reduces the load that reaches your knee when you walk.", avoid: "Don't bounce out of the bottom stretch to rebound the weight up — bouncing skips the stretched position entirely, which is where most of this exercise's benefit comes from.", link: "https://www.muscleandstrength.com/exercises/standing-calf-raise.html" , alts: ["Dumbbell Standing Calf Raise", "Seated / Cable Calf Raise Machine", "Smith Reverse Calf Raise"] },
@@ -120,8 +131,8 @@ const DAYS = [
     color: "#6C63FF",
     bg: "#EEEDFE",
     sub: "Shoulders FIRST · Free-Bar Chest · Triceps",
-    phases: ["8 min bike warm-up", "45 min push", "12 min treadmill finisher"],
-    cardio: { machine: "treadmill", mode: "intervals", duration: "~12 min", target: "6 rounds: 30 sec fast / 90 sec walk", note: "Push the 30-second efforts hard — near a jog or fast walk on incline. Full recovery walk between. This is your one higher-intensity cardio session of the week." },
+    phases: ["5 min bike warm-up", "45 min push", "8 min treadmill finisher"],
+    cardio: { machine: "treadmill", mode: "intervals", duration: "~8 min", target: "4 rounds: 30 sec fast / 90 sec walk", note: "Push the 30-second efforts hard — near a jog or fast walk on incline. Full recovery walk between. This is your one higher-intensity cardio session of the week." },
     exercises: [
       { name: "Cable Shoulder Press", sets: 4, reps: "8–10", rest: 90, muscles: "All three deltoid heads, Triceps", note: "Trained first while shoulders are completely fresh — same logic as rear delts first on pull days. Dual low pulleys (or a single-arm alternating set-up), press straight overhead, stop just short of elbow lockout.", tip: "Cables keep tension on the delt through the whole press, unlike a machine which unloads at the top — genuinely different stimulus from Monday's machine press, not just the same lift with a new name.", avoid: "Don't arch your lower back to help press the last few reps up — if you need to lean back to lock out, the weight's too heavy for strict form.", link: "https://www.muscleandstrength.com/exercises/cable-shoulder-press.html" , alts: ["Machine Shoulder Press", "Dumbbell Shoulder Press (seated)", "Barbell Seated Overhead Press"] },
       { name: "Cable One-Arm Lateral Raise", sets: 3, reps: "15 each arm", rest: 45, muscles: "Lateral deltoid", note: "Low pulley, stand side-on, handle in far hand crossing your body. Raise to shoulder height, 4-second controlled lowering, then switch arms.", tip: "Unilateral work exposes and fixes left/right delt imbalances that a bilateral raise like Monday's can hide — a real variation, not just a tempo tweak on the same set-up.", avoid: "Don't let your torso lean away from the cable to help swing the weight up — keep the movement isolated to the shoulder joint, not a whole-body heave.", link: "https://www.muscleandstrength.com/exercises/cable-one-arm-lateral-raise.html" , alts: ["Cable Lateral Raise (bilateral)", "Dumbbell Lateral Raise", "Lever Lateral Raise (Machine)"] },
@@ -130,7 +141,7 @@ const DAYS = [
       { name: "Cable Crossover — Low-to-High", sets: 3, reps: "12–15", rest: 60, muscles: "Upper/outer chest", note: "Set both pulleys at the LOW position this time (opposite of Monday). Standing upright between the towers, sweep both handles up and across in front of your face in a wide arc — this angle hits the upper chest fibres Monday's high-to-low version misses.", tip: "Same tower, opposite pulley height — small setup change, different part of the chest trained.", avoid: "Don't set the pulleys high out of habit from Monday's version — low pulleys are what make this the upper-chest variant; high pulleys just repeats Monday's exercise under a different name.", link: "https://www.muscleandstrength.com/exercises/cable-crossover.html" , alts: ["Dumbbell Incline Fly", "Smith Machine Incline Bench Press", "Lever Chest Press (Machine)"] },
       { name: "Close-Grip Barbell Bench Press", sets: 3, reps: "10–12", rest: 75, muscles: "Triceps, Inner chest", note: "Same bar and rack as your bench press, hands just inside shoulder-width. Lower to your lower chest, elbows tracking close to your sides rather than flaring out.", tip: "This is your compound tricep builder — heavier overall load than any cable pushdown, which is exactly what triceps need to keep growing.", avoid: "Don't grip too narrow (hands closer than shoulder-width) — that stresses the wrists, and don't let elbows flare out, which shifts the load back onto chest and shoulders.", link: "https://www.muscleandstrength.com/exercises/close-grip-bench-press.html" , alts: ["Cable Tricep Pushdown (rope)", "Dumbbell Close-Grip Press", "Bodyweight Triceps Dip"] },
       { name: "Dumbbell Seated Triceps Extension", sets: 3, reps: "12", rest: 60, muscles: "Long head of triceps", note: "Sit on a bench, back straight. Hold one dumbbell with both hands, press it straight overhead. Bend elbows and lower the dumbbell behind your head, upper arms staying close to your ears, then press back up.", tip: "This is your only free-weight isolation move for triceps this week — the compound close-grip press above builds raw strength, this finishes the long head with a deep overhead stretch a cable can't quite replicate at this angle.", avoid: "Don't let your elbows flare outward as you lower the weight — keeping them close to your ears is what keeps the stretch on the triceps instead of the shoulder joint.", link: "https://www.muscleandstrength.com/exercises/seated-dumbbell-triceps-extension.html" , alts: ["Cable Overhead Tricep Extension (rope)", "Barbell Lying Triceps Extension (Skull Crusher)", "Lever Overhand Triceps Dip (Machine)"] },
-      { name: "Weighted Russian Twist", sets: 3, reps: "15 each side", rest: 45, muscles: "Abs, Obliques, Lower back", note: "Sit with knees bent, feet flat or hovering, torso leaned back to about 45° and braced. Hold a plate or dumbbell with both hands and rotate it side to side, tapping the floor near your hip each side.", tip: "Same fat-zone logic as Monday's ab finisher — Thursday had none before this, now every day of the week hits the core.", avoid: "Don't round or slump your lower back to reach further on the twist — keep the 45° brace fixed, the rotation should come from your torso, not from your spine collapsing.", link: "https://www.muscleandstrength.com/exercises/russian-twist.html" },
+      { name: "Cable Pallof Press (anti-rotation)", sets: 3, reps: "12 each side", rest: 45, muscles: "Obliques, Deep core (anti-rotation)", note: "Stand side-on to a mid-height pulley, handle held at your chest with both hands. Press the handle straight out in front of you and hold 2 seconds, resisting the cable's pull trying to rotate your torso toward the machine, then return to your chest.", tip: "Same fat-zone/oblique target as a Russian Twist, but your spine stays still while you resist rotation instead of flexing and twisting under load — loaded twisting is one of the more common ways people hurt their lower back, this trains the same muscles without that risk.", avoid: "Don't let your hips or shoulders rotate toward the cable as you press out — if you can't stop the rotation, you're standing too close or the weight's too heavy; the whole point is your torso staying dead still.", link: "https://www.muscleandstrength.com/exercises/pallof-press.html" , alts: ["Cable Woodchop (FAT ZONE)", "Dumbbell Side Bend", "Weighted Russian Twist"] },
     ],
   },
   {
@@ -140,8 +151,8 @@ const DAYS = [
     color: "#0DBD8B",
     bg: "#E1F5EE",
     sub: "Rear Delts FIRST → Back Thickness → Biceps",
-    phases: ["8 min bike warm-up", "45 min pull", "12 min cycle finisher"],
-    cardio: { machine: "cycle", mode: "intervals", duration: "12–15 min", target: "1 min hard / 2 min easy, alternating", note: "Same protocol as Tuesday. Seated cycling adds no extra load before tomorrow's Legs B session." },
+    phases: ["5 min bike warm-up", "45 min pull", "7 min cycle finisher"],
+    cardio: { machine: "cycle", mode: "intervals", duration: "6–8 min", target: "1 min hard / 2 min easy, alternating", note: "Same protocol as Tuesday. Seated cycling adds no extra load before tomorrow's Legs B session." },
     exercises: [
       { name: "Barbell Rear Delt Raise", sets: 4, reps: "15", rest: 45, muscles: "Rear deltoids, Rhomboids", note: "Bent over at the hips ~45°, barbell hanging at arm's length, palms facing you. Raise the bar out and up by driving elbows high and wide until arms are level with your torso, squeeze 1 second, lower slowly.", tip: "Free-bar bent-over raise instead of Tuesday's machine fly — different balance and stabiliser demand on the same small muscle, real variation rather than a paused rep on the same machine.", avoid: "Don't round your lower back to stay bent over, and don't stand up to help swing the bar — keep the hinge fixed at 45° and let the rear delts do the raising, not your lower back or legs.", link: "https://www.muscleandstrength.com/exercises/bent-over-barbell-rear-delt-raise.html" , alts: ["Rear Delt Machine Fly", "Dumbbell Rear Delt Raise", "Cable Face Pull (rope, high pulley)"] },
       { name: "Cable Straight-Arm Pulldown", sets: 3, reps: "15", rest: 60, muscles: "Lats, Serratus", note: "High pulley, straight-bar or rope attachment, arms kept straight the whole movement. Pull down to your hips by squeezing your lats — imagine pinching a pencil in your armpits.", tip: "With arms straight, biceps physically can't help — this is pure lat isolation before the compound rows tire your arms out.", avoid: "Don't bend your elbows to help pull the weight down — as soon as elbows bend, biceps take over and the lat isolation this exercise is for is lost.", link: "https://www.muscleandstrength.com/exercises/straight-arm-pulldown.html" , alts: ["Dumbbell Pullover", "Lat Pulldown (wide grip, Machine)", "Bodyweight Pull-Up (neutral grip)"] },
@@ -161,8 +172,8 @@ const DAYS = [
     color: "#FF6B35",
     bg: "#FAECE7",
     sub: "Knee-Prehab FIRST → Hamstrings/Glutes → Calves",
-    phases: ["10 min bike warm-up + knee prep", "40 min legs", "12 min treadmill finisher"],
-    cardio: { machine: "treadmill", mode: "steady", duration: "12–15 min", target: "8–12% incline, brisk pace", note: "Same protocol as Monday — steady incline walk to close the week's cardio volume." },
+    phases: ["7 min bike warm-up + knee prep", "40 min legs", "7 min treadmill finisher"],
+    cardio: { machine: "treadmill", mode: "steady", duration: "6–8 min", target: "8–12% incline, brisk pace", note: "Same protocol as Monday — steady incline walk to close the week's cardio volume." },
     exercises: [
       { name: "Leg Extension Machine — Activation Sets (KNEE FIX)", sets: 3, reps: "15–20", rest: 45, muscles: "VMO (inner quad), Knee stabilisers", note: "Same protocol as Wednesday — light weight, stop short of lockout, controlled tempo. Non-negotiable on both leg days regardless of how the knee feels that day.", tip: "Skipping this on the days it feels fine is exactly how the pain comes back — consistency here is what builds lasting knee resilience, not intensity.", avoid: "Don't extend to a hard lockout and don't use momentum to kick the weight up — same rule as Wednesday, this is activation work, not a strength set.", link: "https://www.muscleandstrength.com/exercises/leg-extensions.html" , alts: ["Sled Leg Press — High Foot Placement", "Dumbbell Goblet Squat (shallow)", "Smith Chair Squat (wall-sit style)"] },
       { name: "Leg Curl Machine (lying or seated)", sets: 4, reps: "10–12", rest: 90, muscles: "Hamstrings", note: "Pad positioned just above the heel. Curl through a full range without lifting your hips off the pad, squeeze 1 second at the top, lower over 3 seconds.", tip: "Quad-dominant training (leg press, squats) without matching hamstring work creates a strength imbalance that itself stresses the knee joint — this exercise is what balances it out.", avoid: "Don't let your hips lift off the pad to help curl the weight up — that's lower back taking over from hamstrings, and it's how this exercise stops training what it's meant to.", link: "https://www.muscleandstrength.com/exercises/lying-leg-curl.html" , alts: ["Smith Machine Romanian Deadlift", "Dumbbell Romanian Deadlift", "Barbell Good Morning"] },
@@ -501,7 +512,7 @@ function resolveVariant(activeName: string | undefined, ex: any, day: any): any 
   return { ...ex, gif: findLocalGif(ex.name) };
 }
 
-type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" };
+type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" | "voice"; effort?: Effort | null };
 type ExLogs = Record<number, SetLog>;
 type HistoryPoint = { date: string; weight: number | null; sets: number; reps: number };
 
@@ -553,13 +564,15 @@ function ThemeStyles() {
 
 function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
   dayColor: string; repsRange: { min: number; max: number } | null;
-  onPick: (reps: number | null) => void; onClose: () => void;
+  onPick: (reps: number | null, effort: Effort | null) => void; onClose: () => void;
 }) {
   const [custom, setCustom] = useState("");
+  const [effort, setEffort] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const chips = repsRange
     ? Array.from(new Set([repsRange.min, repsRange.min + 1, repsRange.max - 1, repsRange.max].filter((n) => n > 0))).sort((a, b) => a - b)
     : [];
+  const withEffort = (reps: number) => onPick(reps, effort == null ? null : { value: effort, scale: "RIR" as const });
 
   // Close on an outside tap — but only start listening a tick after mount, so
   // the trailing synthetic click from the *same* tap that opened this popover
@@ -586,9 +599,9 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
         <div className="eyebrow center">Actual reps</div>
         <div className="chip-row center">
           {chips.map((n) => (
-            <button key={n} className="chip-btn" style={{ "--dc": dayColor } as any} onClick={() => onPick(n)}>{n}</button>
+            <button key={n} className="chip-btn" style={{ "--dc": dayColor } as any} onClick={() => withEffort(n)}>{n}</button>
           ))}
-          <button className="chip-btn ghost" onClick={() => onPick(0)}>Skip</button>
+          <button className="chip-btn ghost" onClick={() => onPick(0, null)}>Skip</button>
         </div>
         <div className="input-row">
           <input
@@ -600,8 +613,19 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
           <button
             className="square-btn"
             style={{ "--dc": dayColor } as any}
-            onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) onPick(n); }}
+            onClick={() => { const n = parseInt(custom, 10); if (!Number.isNaN(n)) withEffort(n); }}
           >✓</button>
+        </div>
+        <div className="eyebrow center" style={{ marginTop: 12 }}>Effort — reps left in tank (optional)</div>
+        <div className="chip-row center">
+          {[0, 1, 2, 3].map((n) => (
+            <button
+              key={n}
+              className={`chip-btn ${effort === n ? "active" : "ghost"}`}
+              style={{ "--dc": dayColor } as any}
+              onClick={() => setEffort(effort === n ? null : n)}
+            >{n === 3 ? "3+" : n}</button>
+          ))}
         </div>
       </div>
       <style jsx>{`
@@ -611,6 +635,7 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
         .center { text-align: center; }
         .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .chip-btn { width: 46px; height: 46px; border-radius: 12px; border: 1.5px solid var(--dc, var(--brass)); background: color-mix(in srgb, var(--dc, var(--brass)) 16%, transparent); color: var(--dc, var(--brass)); font-size: 16px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+        .chip-btn.active { background: var(--dc, var(--brass)); color: var(--brass-ink); }
         .chip-btn.ghost { border-color: var(--hairline); background: var(--surface-2); color: var(--ink-dim); font-size: 13px; font-weight: 600; padding: 0 14px; width: auto; }
         .input-row { display: flex; gap: 8px; }
         .text-input { flex: 1; min-width: 0; height: 46px; border-radius: 12px; border: 1px solid var(--hairline); background: var(--surface-2); color: var(--ink); padding: 0 14px; font-size: 16px; box-sizing: border-box; }
@@ -624,7 +649,7 @@ function RepsPopover({ dayColor, repsRange, onPick, onClose }: {
 function SetPip({ setIdx, dayColor, log, repsRange, onConfirm }: {
   setIdx: number; dayColor: string; log?: SetLog;
   repsRange: { min: number; max: number } | null;
-  onConfirm: (setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
+  onConfirm: (setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
 }) {
   const [holding, setHolding] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -650,7 +675,7 @@ function SetPip({ setIdx, dayColor, log, repsRange, onConfirm }: {
     if (!holding) return;
     confirmedRef.current = true;
     setHolding(false);
-    onConfirm(setIdx, repsRange?.max ?? null, "hold");
+    onConfirm(setIdx, repsRange?.max ?? null, "hold", null);
   };
 
   return (
@@ -669,13 +694,14 @@ function SetPip({ setIdx, dayColor, log, repsRange, onConfirm }: {
           onTransitionEnd={(e) => { if (e.propertyName === "transform") onFillDone(); }}
         />
         <span className="num">{done ? (log!.reps ?? "✓") : setIdx + 1}</span>
+        {done && log!.effort && <span className="effort-badge">{log!.effort.scale === "RIR" ? `R${log!.effort.value}` : log!.effort.value}</span>}
       </button>
 
       {pickerOpen && (
         <RepsPopover
           dayColor={dayColor}
           repsRange={repsRange}
-          onPick={(reps) => { setPickerOpen(false); onConfirm(setIdx, reps, "tap"); }}
+          onPick={(reps, effort) => { setPickerOpen(false); onConfirm(setIdx, reps, "tap", effort); }}
           onClose={() => setPickerOpen(false)}
         />
       )}
@@ -695,6 +721,7 @@ function SetPip({ setIdx, dayColor, log, repsRange, onConfirm }: {
         .fill[data-holding="true"] { transition: transform 900ms linear; transform: scale(1); }
         .pip.done .fill { transform: scale(1); transition: none; }
         .num { position: relative; z-index: 1; }
+        .effort-badge { position: absolute; top: -4px; right: -4px; z-index: 2; background: var(--surface); border: 1px solid var(--dc, var(--brass)); color: var(--dc, var(--brass)); font-size: 8px; font-weight: 800; line-height: 1; padding: 2px 3px; border-radius: 6px; }
         .pip.done .num, .fill[data-holding="true"] ~ .num { color: var(--brass-ink); }
       `}</style>
     </div>
@@ -703,7 +730,7 @@ function SetPip({ setIdx, dayColor, log, repsRange, onConfirm }: {
 
 function SetPipRow({ ex, exIdx, dayColor, logs, onConfirm }: {
   ex: any; exIdx: number; dayColor: string; logs: ExLogs;
-  onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
+  onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
 }) {
   const repsRange = parseRepsRange(ex.reps);
   return (
@@ -711,9 +738,86 @@ function SetPipRow({ ex, exIdx, dayColor, logs, onConfirm }: {
       {Array.from({ length: ex.sets }, (_, si) => (
         <SetPip
           key={si} setIdx={si} dayColor={dayColor} log={logs[si]} repsRange={repsRange}
-          onConfirm={(setIdx, reps, mode) => onConfirm(exIdx, setIdx, reps, mode)}
+          onConfirm={(setIdx, reps, mode, effort) => onConfirm(exIdx, setIdx, reps, mode, effort)}
         />
       ))}
+    </div>
+  );
+}
+
+// ─── VOICE SET LOGGER (hands-free rep counting via Web Speech API) ──────────
+// No new dependency — the browser's native SpeechRecognition covers this.
+// Say "up"/"rep" per rep, "fail" to flag the set as taken to failure, "done"
+// to log the current count. Feature-detected: the mic button simply doesn't
+// render on browsers without SpeechRecognition (mainly Firefox/desktop).
+function VoiceSetLogger({ dayColor, onLog }: { dayColor: string; onLog: (reps: number, failed: boolean) => void }) {
+  const [open, setOpen] = useState(false);
+  const [count, setCount] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const countRef = useRef(0);
+  const failedRef = useRef(false);
+  const recRef = useRef<any>(null);
+
+  const stopAndLog = useCallback(() => {
+    recRef.current?.stop();
+    recRef.current = null;
+    setOpen(false);
+    onLog(countRef.current, failedRef.current);
+  }, [onLog]);
+
+  const bump = (n: number) => { countRef.current = Math.max(0, countRef.current + n); setCount(countRef.current); };
+
+  const start = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    countRef.current = 0; failedRef.current = false;
+    setCount(0); setFailed(false); setOpen(true);
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = false;
+    rec.lang = "en-US";
+    rec.onresult = (e: any) => {
+      const said = e.results[e.results.length - 1][0].transcript.toLowerCase();
+      if (/\bfail/.test(said)) { failedRef.current = true; setFailed(true); }
+      else if (/\b(done|stop|finish)\b/.test(said)) { stopAndLog(); }
+      else if (/\b(up|rep|yes|good|next)\b/.test(said)) { bump(1); }
+    };
+    rec.onerror = () => {};
+    rec.onend = () => { recRef.current = null; setOpen(false); };
+    rec.start();
+    recRef.current = rec;
+  };
+
+  useEffect(() => () => { recRef.current?.stop(); }, []);
+
+  if (!open) {
+    if (typeof window === "undefined" || !((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)) return null;
+    return (
+      <button className="voice-btn" style={{ "--dc": dayColor } as any} onClick={start}>
+        🎤 Voice log this set
+        <style jsx>{`.voice-btn { width: 100%; height: 40px; border-radius: 10px; border: 1.5px dashed var(--dc, var(--brass)); background: transparent; color: var(--dc, var(--brass)); font-size: 13px; font-weight: 700; cursor: pointer; touch-action: manipulation; margin-top: 8px; }`}</style>
+      </button>
+    );
+  }
+
+  return (
+    <div className="voice-overlay" style={{ "--dc": dayColor } as any}>
+      <div className="voice-count">{count}</div>
+      <div className="voice-label">{failed ? "Marked failed — say “done” to log" : "Say “up” each rep · “fail” if you miss one · “done” to log"}</div>
+      <div className="voice-actions">
+        <button className="v-btn ghost" onClick={() => bump(-1)}>−1</button>
+        <button className="v-btn ghost" onClick={() => bump(1)}>+1</button>
+        <button className="v-btn primary" onClick={stopAndLog}>Log {count} reps</button>
+      </div>
+      <style jsx>{`
+        .voice-overlay { margin-top: 8px; padding: 14px; border-radius: 12px; background: color-mix(in srgb, var(--dc) 10%, var(--surface-2)); border: 1.5px solid var(--dc); text-align: center; }
+        .voice-count { font-size: 32px; font-weight: 800; color: var(--dc); line-height: 1; }
+        .voice-label { font-size: 11px; color: var(--ink-faint); margin: 6px 0 10px; }
+        .voice-actions { display: flex; gap: 8px; }
+        .v-btn { flex: 1; height: 38px; border-radius: 10px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; touch-action: manipulation; }
+        .v-btn.ghost { background: var(--surface); color: var(--dc); border: 1px solid var(--dc); }
+        .v-btn.primary { background: var(--dc); color: var(--brass-ink); }
+      `}</style>
     </div>
   );
 }
@@ -1076,13 +1180,14 @@ function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
 
 // ─── SESSION CARD (single exercise, full-bleed) ──────────────────────────────
 
-function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weights, onWeightChange, isLast, allDone, onNext, activeVariant, onSwitchVariant, dayHistory }: {
+function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weights, onWeightChange, isLast, allDone, onNext, activeVariant, onSwitchVariant, dayHistory, bestWeights }: {
   ex: any; exIdx: number; dayIdx: number; day: any; dayColor: string;
-  logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
+  logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
   weights: Record<string, number>; onWeightChange: (name: string, weight: number | null) => void;
   isLast: boolean; allDone: boolean; onNext: () => void;
   activeVariant?: string; onSwitchVariant: (name: string | null) => void;
   dayHistory: Record<string, number[]>;
+  bestWeights: Record<string, number>;
 }) {
   const [showWeight, setShowWeight] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -1102,6 +1207,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
   // fetched for the sparkline) carries the same last-logged number, so fall
   // back to it instead of flashing an empty "—" the user reads as broken.
   const displayWeight = weight ?? (history.length ? history[history.length - 1] : null);
+  const prWeight = Math.max(bestWeights[activeEx.name] ?? 0, weight ?? 0) || null;
 
   return (
     <div className="card">
@@ -1126,7 +1232,11 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
       )}
 
       <button className="weight-block" onClick={() => setShowWeight(true)}>
-        <div className="wb-label"><span>{displayWeight != null ? "Last weight" : "Working weight"}</span><span className="edit-hint">Tap to edit ›</span></div>
+        <div className="wb-label">
+          <span>{displayWeight != null ? "Last weight" : "Working weight"}</span>
+          {prWeight != null && <span className="pr-chip">🏆 PR {prWeight}kg</span>}
+          <span className="edit-hint">Tap to edit ›</span>
+        </div>
         <div className="wb-num-row">
           <span className="wb-num">{displayWeight ?? "—"}</span><span className="wb-unit">kg</span>
           {history.length >= 2 && <div className="wb-spark"><Sparkline points={history} color={dayColor} /></div>}
@@ -1136,6 +1246,16 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
       <div className="sets-label">Sets</div>
       <SetPipRow ex={ex} exIdx={exIdx} dayColor={dayColor} logs={logs} onConfirm={onConfirm} />
       {ex.rest > 0 && <div className="rest-hint">Hold a circle ~1s to log the set and start your {ex.rest}s rest.</div>}
+      {!allDone && (
+        <VoiceSetLogger
+          dayColor={dayColor}
+          onLog={(reps, failed) => {
+            const nextIdx = Array.from({ length: ex.sets }, (_, i) => i).find((i) => !logs[i]);
+            if (nextIdx == null) return;
+            onConfirm(exIdx, nextIdx, reps, "voice", failed ? { value: 0, scale: "RIR" } : null);
+          }}
+        />
+      )}
 
       <div className="footer">
         <div className={`nudge ${allDone ? "show" : ""}`} onClick={() => allDone && !isLast && onNext()} style={{ "--dc": dayColor } as any}>
@@ -1180,6 +1300,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
         .weight-block { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         .wb-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .edit-hint { color: var(--ink-dim); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 11px; }
+        .pr-chip { color: #B8860B; font-weight: 800; text-transform: none; letter-spacing: 0; font-size: 11px; }
         .wb-num-row { display: flex; align-items: baseline; gap: 8px; }
         .wb-num { font-variant-numeric: tabular-nums; font-size: 38px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; color: var(--ink); }
         .wb-unit { font-size: 14px; font-weight: 700; color: var(--ink-dim); }
@@ -1200,10 +1321,11 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
 
 // ─── SESSION DECK (swipeable day view) ───────────────────────────────────────
 
-function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, dayHistory, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
+function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, dayHistory, bestWeights, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
   day: any; dayIdx: number; logs: Record<number, ExLogs>;
-  onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => void;
+  onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
   weights: Record<string, number>; onWeightChange: (name: string, weight: number | null) => void;
+  bestWeights: Record<string, number>;
   dayHistory: Record<string, number[]>;
   timerVal: number | null; timerTotal: number; onSkipRest: () => void; onAddRestTime: () => void;
   variants: Record<string, string>; onSwitchVariant: (exIdx: number, name: string | null) => void;
@@ -1286,6 +1408,7 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, da
               weights={weights}
               onWeightChange={onWeightChange}
               dayHistory={dayHistory}
+              bestWeights={bestWeights}
               isLast={i === day.exercises.length - 1}
               allDone={Object.keys(logs[i] || {}).length >= ex.sets}
               onNext={() => goTo(i + 1)}
@@ -2105,9 +2228,74 @@ function CardioInsightsModal({ password, onClose }: { password: string; onClose:
   );
 }
 
+// Mon..Sat dates of the current week, as "YYYY-MM-DD" — matches DAYS' index
+// order (DAYS[0] is Monday) so plannedSets lines up with the right day.
+function thisWeekDates(): string[] {
+  const now = new Date();
+  const dow = now.getDay(); // Sun=0..Sat=6
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  return Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
+}
+
+// "This week" strip — one pip per Mon..Sat showing sets logged vs. planned
+// for that day's template. Reuses the existing /calendar endpoint (per-date
+// set counts) rather than adding a new route; fetches every distinct month
+// the week's 6 dates fall into, so a week straddling a month boundary (e.g.
+// Mon Aug 31 → Sat Sep 5) still resolves correctly instead of showing blanks.
+function WeekStrip({ password }: { password: string }) {
+  const dates = thisWeekDates();
+  const today = todayStr();
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const months = Array.from(new Set(dates.map((d) => d.slice(0, 7))));
+    Promise.all(
+      months.map((m) =>
+        fetch(`/api/progress/calendar?month=${m}&today=${today}`, { headers: { "x-app-password": password } })
+          .then((r) => r.json())
+          .catch(() => ({ days: {} }))
+      )
+    ).then((results) => {
+      const merged: Record<string, number> = {};
+      for (const r of results) Object.assign(merged, r.days || {});
+      setCounts(merged);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dates.join(","), password]);
+
+  return (
+    <div className="week-strip">
+      {dates.map((date, i) => {
+        const d = DAYS[i];
+        const planned = d.exercises.reduce((a, ex) => a + ex.sets, 0);
+        const done = counts[date] || 0;
+        const state = done >= planned ? "done" : done > 0 ? "partial" : "pending";
+        return (
+          <div key={date} className={`week-pip ${state} ${date === today ? "today" : ""}`} style={{ "--dc": d.color } as any} title={`${d.label}: ${done}/${planned} sets`}>
+            <span>{d.label.slice(0, 1)}</span>
+          </div>
+        );
+      })}
+      <style jsx>{`
+        .week-strip { display: flex; gap: 6px; margin-bottom: 16px; }
+        .week-pip { flex: 1; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: var(--surface-2); color: var(--ink-faint); border: 1.5px solid transparent; }
+        .week-pip.today { border-color: var(--dc); }
+        .week-pip.partial { background: color-mix(in srgb, var(--dc) 30%, var(--surface-2)); color: var(--ink); }
+        .week-pip.done { background: var(--dc); color: var(--brass-ink); }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── HOME SCREEN ──────────────────────────────────────────────────────────────
 
-function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, onStartMobility, onOpenCalendar, onOpenInsights, onOpenCardioInsights, onOpenNotion, onOpenExplore }: {
+function HomeScreen({ password, liftStreak, cardioStreak, onStartWorkout, onStartCardio, onStartMobility, onOpenCalendar, onOpenInsights, onOpenCardioInsights, onOpenNotion, onOpenExplore }: {
+  password: string;
   liftStreak: { current: number; longest: number }; cardioStreak: { current: number; longest: number };
   onStartWorkout: () => void; onStartCardio: () => void; onStartMobility: () => void;
   onOpenCalendar: () => void; onOpenInsights: () => void; onOpenCardioInsights: () => void; onOpenNotion: () => void;
@@ -2122,6 +2310,12 @@ function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, o
         <div className="brand">Aztec Body Trainer</div>
         <div className="tagline">Phase 3 · Gym Plan</div>
       </div>
+
+      {isDeloadWeek() && (
+        <div className="deload-banner">Deload week — same exercises, ~40% less weight, same reps. Lets joints and tendons catch up before next week's normal loading.</div>
+      )}
+
+      <WeekStrip password={password} />
 
       <div className="streaks">
         <button className="streak-card" onClick={onOpenCalendar}>
@@ -2170,6 +2364,7 @@ function HomeScreen({ liftStreak, cardioStreak, onStartWorkout, onStartCardio, o
         .top { margin-bottom: 24px; }
         .brand { font-size: 24px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
         .tagline { font-size: 12px; color: var(--ink-faint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+        .deload-banner { background: #FFF4E5; border: 1px solid #FFD9A0; color: #8A5A00; font-size: 12px; font-weight: 600; padding: 10px 12px; border-radius: 12px; margin-bottom: 14px; line-height: 1.4; }
         .streaks { display: flex; gap: 10px; margin-bottom: 20px; }
         .streak-card { flex: 1; background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; touch-action: manipulation; }
         .streak-num { font-size: 22px; font-weight: 800; color: var(--ink); }
@@ -2226,6 +2421,7 @@ export default function WorkoutApp() {
   // Exercise name → weight history for the currently open day's exercises,
   // loaded once per day (was previously one fetch per exercise card).
   const [dayHistory, setDayHistory] = useState<Record<string, number[]>>({});
+  const [bestWeights, setBestWeights] = useState<Record<string, number>>({});
   // Sets still waiting to sync to the server — see the outbox helpers above.
   const [pendingSync, setPendingSync] = useState(0);
   const [showNotion, setShowNotion] = useState(false);
@@ -2295,6 +2491,7 @@ export default function WorkoutApp() {
           sliced[name] = weights.slice(-6);
         }
         setDayHistory(sliced);
+        setBestWeights(data.bestByName || {});
       })
       .catch(() => showToast("⚠️ Weight history didn't load — connection issue"));
   }, [showToast]);
@@ -2405,6 +2602,7 @@ export default function WorkoutApp() {
           const data = await r.json();
           if (data.streak) setStreak(data.streak);
           if (data.lastWeights) setWeights(data.lastWeights);
+          if (data.isPR) showToast(`🏆 New PR — ${box[key].exercise} at ${box[key].weight}kg`);
           const remaining = readOutbox();
           delete remaining[key];
           writeOutbox(remaining);
@@ -2415,7 +2613,7 @@ export default function WorkoutApp() {
           // event) will retry it. Nothing lost, nothing to do here.
         });
     });
-  }, [password]);
+  }, [password, showToast]);
 
   // Retries whatever's still queued on a timer and the moment the browser
   // regains a connection — covers both "signal drops mid-request" and
@@ -2431,14 +2629,14 @@ export default function WorkoutApp() {
     };
   }, [password, flushOutbox]);
 
-  const handleConfirm = (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap") => {
+  const handleConfirm = (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => {
     const dk = `${dayIdx}`;
     const activeName = resolveVariant(variants[`${dayIdx}-${exIdx}`], day.exercises[exIdx], day).name;
     const weight = weights[activeName] ?? null;
     setLogs((prev) => {
       const dayLogs = prev[dk] || {};
       const exLogs = dayLogs[exIdx] || {};
-      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, weight, mode } } } };
+      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, weight, mode, effort } } } };
     });
     const restSec = day.exercises[exIdx].rest;
     if (restSec > 0) {
@@ -2447,7 +2645,7 @@ export default function WorkoutApp() {
       setRestFor(exIdx);
     }
 
-    const box = queueSet({ date: todayStr(), dayIdx, exIdx, setIdx, reps, weight, mode, exercise: activeName });
+    const box = queueSet({ date: todayStr(), dayIdx, exIdx, setIdx, reps, weight, mode, exercise: activeName, effort });
     setPendingSync(Object.keys(box).length);
     flushOutbox();
   };
@@ -2511,6 +2709,7 @@ export default function WorkoutApp() {
         <ThemeStyles />
         <ErrorToast message={toast} onDismiss={() => setToast(null)} />
         <HomeScreen
+          password={password || ""}
           liftStreak={streak}
           cardioStreak={cardioStreak}
           onStartWorkout={startWorkout}
@@ -2593,6 +2792,7 @@ export default function WorkoutApp() {
         weights={weights}
         onWeightChange={handleWeightChange}
         dayHistory={dayHistory}
+        bestWeights={bestWeights}
         timerVal={restFor != null ? (timers[`${restFor}`] ?? 0) : null}
         timerTotal={restTotal}
         onSkipRest={() => { if (restFor != null) skipTimer(`${restFor}`); setRestFor(null); }}

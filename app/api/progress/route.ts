@@ -30,6 +30,25 @@ function computeLastWeights(docs: DayDoc[], today: string) {
   return lastWeights
 }
 
+// Heaviest weight ever logged for one exercise, across every day on record —
+// used to tell whether a just-saved set is a new PR. Weight-only (not e1RM):
+// simplest thing a non-advanced lifter reads as "personal record" at a glance.
+function bestWeightFor(docs: DayDoc[], exercise: string): number | null {
+  let best: number | null = null
+  for (const doc of docs) {
+    for (const exercises of Object.values(doc.templates ?? {})) {
+      for (const sets of Object.values(exercises)) {
+        for (const set of Object.values(sets)) {
+          if (set.exercise === exercise && set.weight != null && (best == null || set.weight > best)) {
+            best = set.weight
+          }
+        }
+      }
+    }
+  }
+  return best
+}
+
 export async function GET(req: NextRequest) {
   const authErr = requireAuth(req)
   if (authErr) return authErr
@@ -55,17 +74,24 @@ export async function POST(req: NextRequest) {
   const authErr = requireAuth(req)
   if (authErr) return authErr
 
-  const { date, dayIdx, exIdx, setIdx, reps, weight, mode, exercise } = await req.json()
+  const { date, dayIdx, exIdx, setIdx, reps, weight, mode, exercise, effort } = await req.json()
   if (!date || dayIdx == null || exIdx == null || setIdx == null) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 })
   }
 
   const db = await getDb()
   const col = db.collection<DayDoc>("workout_days")
+
+  const priorDocs = exercise && weight != null
+    ? await col.find({}, { projection: { _id: 1, templates: 1 } }).toArray()
+    : []
+  const priorBest = exercise && weight != null ? bestWeightFor(priorDocs, exercise) : null
+  const isPR = weight != null && priorBest != null && weight > priorBest
+
   const path = `templates.${dayIdx}.${exIdx}.${setIdx}`
   await col.updateOne(
     { _id: date },
-    { $set: { [path]: { reps, weight: weight ?? null, mode, exercise: exercise ?? null, at: new Date() } } },
+    { $set: { [path]: { reps, weight: weight ?? null, mode, exercise: exercise ?? null, effort: effort ?? null, at: new Date() } } },
     { upsert: true }
   )
 
@@ -73,5 +99,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     streak: computeStreak(allDocs.map((d) => d._id), date),
     lastWeights: computeLastWeights(allDocs, date),
+    isPR,
   })
 }

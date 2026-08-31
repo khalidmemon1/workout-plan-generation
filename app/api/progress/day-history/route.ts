@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     .toArray()
 
   const byName: Record<string, { date: string; weight: number | null; sets: number; reps: number }[]> = {}
+  const bestByName: Record<string, number> = {}
   for (const doc of docs) {
     const setsByName: Record<string, SetLog[]> = {}
     for (const exercises of Object.values(doc.templates ?? {})) {
@@ -38,14 +39,18 @@ export async function GET(req: NextRequest) {
     for (const [name, sets] of Object.entries(setsByName)) {
       const weights = sets.map((s) => s.weight).filter((w): w is number => w != null)
       const reps = sets.reduce((a, s) => a + (s.reps ?? 0), 0)
+      const dayBest = weights.length ? Math.max(...weights) : null
       ;(byName[name] ??= []).push({
         date: doc._id,
-        weight: weights.length ? Math.max(...weights) : null,
+        weight: dayBest,
         sets: sets.length,
         reps,
       })
+      if (dayBest != null && (bestByName[name] == null || dayBest > bestByName[name])) {
+        bestByName[name] = dayBest
+      }
     }
   }
 
-  return NextResponse.json({ byName })
+  return NextResponse.json({ byName, bestByName })
 }
