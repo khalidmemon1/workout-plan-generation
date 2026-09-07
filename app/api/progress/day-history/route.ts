@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getDb } from "@/lib/mongodb"
 import { requireAuth } from "@/lib/auth"
-import type { DayDoc, SetLog } from "@/lib/types"
+import { buildHistoryByNames } from "@/lib/exerciseHistory.mjs"
+import type { DayDoc } from "@/lib/types"
 
 // Weight-history sparkline data, one request for every exercise currently
 // visible on a day instead of one request per card. Scoped by exercise name
@@ -24,33 +25,7 @@ export async function GET(req: NextRequest) {
     .sort({ _id: 1 })
     .toArray()
 
-  const byName: Record<string, { date: string; weight: number | null; sets: number; reps: number }[]> = {}
-  const bestByName: Record<string, number> = {}
-  for (const doc of docs) {
-    const setsByName: Record<string, SetLog[]> = {}
-    for (const exercises of Object.values(doc.templates ?? {})) {
-      for (const sets of Object.values(exercises)) {
-        for (const set of Object.values(sets)) {
-          if (!set.exercise || !names.has(set.exercise)) continue
-          ;(setsByName[set.exercise] ??= []).push(set)
-        }
-      }
-    }
-    for (const [name, sets] of Object.entries(setsByName)) {
-      const weights = sets.map((s) => s.weight).filter((w): w is number => w != null)
-      const reps = sets.reduce((a, s) => a + (s.reps ?? 0), 0)
-      const dayBest = weights.length ? Math.max(...weights) : null
-      ;(byName[name] ??= []).push({
-        date: doc._id,
-        weight: dayBest,
-        sets: sets.length,
-        reps,
-      })
-      if (dayBest != null && (bestByName[name] == null || dayBest > bestByName[name])) {
-        bestByName[name] = dayBest
-      }
-    }
-  }
+  const { byName, bestByName } = buildHistoryByNames(docs, names)
 
   return NextResponse.json({ byName, bestByName })
 }

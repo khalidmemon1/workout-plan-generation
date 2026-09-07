@@ -512,7 +512,16 @@ function resolveVariant(activeName: string | undefined, ex: any, day: any): any 
   return { ...ex, gif: findLocalGif(ex.name) };
 }
 
-type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" | "voice"; effort?: Effort | null };
+// Every name that can ever end up in a logged set's `exercise` field: every
+// planned exercise, plus every alt it can be switched to. The progress page
+// needs this full list up front since day-history is scoped to whatever
+// names you ask it for — it doesn't discover names on its own.
+const ALL_EXERCISE_NAMES: string[] = Array.from(new Set([
+  ...DAYS.flatMap((d) => d.exercises.map((e) => e.name)),
+  ...Object.values(EXERCISE_ALTS).flat(),
+]));
+
+type SetLog = { reps: number | null; weight: number | null; mode: "hold" | "tap" | "voice"; effort?: Effort | null; exercise?: string | null };
 type ExLogs = Record<number, SetLog>;
 type HistoryPoint = { date: string; weight: number | null; sets: number; reps: number };
 
@@ -1180,7 +1189,7 @@ function SwitchSheet({ ex, day, activeName, dayColor, onPick, onClose }: {
 
 // ─── SESSION CARD (single exercise, full-bleed) ──────────────────────────────
 
-function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weights, onWeightChange, isLast, allDone, onNext, activeVariant, onSwitchVariant, dayHistory, bestWeights }: {
+function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weights, onWeightChange, isLast, allDone, onNext, activeVariant, onSwitchVariant, dayHistory, bestWeights, onOpenProgress }: {
   ex: any; exIdx: number; dayIdx: number; day: any; dayColor: string;
   logs: ExLogs; onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
   weights: Record<string, number>; onWeightChange: (name: string, weight: number | null) => void;
@@ -1188,6 +1197,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
   activeVariant?: string; onSwitchVariant: (name: string | null) => void;
   dayHistory: Record<string, number[]>;
   bestWeights: Record<string, number>;
+  onOpenProgress: (name: string) => void;
 }) {
   const [showWeight, setShowWeight] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -1215,6 +1225,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
       <div className="title-row">
         <h2>{activeEx.name}</h2>
         <button className="switch-btn" onClick={() => setShowSwitch(true)} aria-label="Switch to a different exercise">⇄</button>
+        <button className="info-btn" onClick={() => onOpenProgress(activeEx.name)} aria-label="See progress for this exercise">📈</button>
         <button className="info-btn" onClick={() => setShowInfo(true)} aria-label="How to do this exercise">ⓘ</button>
       </div>
       {isSwapped && <div className="swap-note">Standing in for <strong>{ex.name}</strong> · same {ex.sets}×{ex.reps}</div>}
@@ -1321,7 +1332,7 @@ function SessionCard({ ex, exIdx, dayIdx, day, dayColor, logs, onConfirm, weight
 
 // ─── SESSION DECK (swipeable day view) ───────────────────────────────────────
 
-function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, dayHistory, bestWeights, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant }: {
+function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, dayHistory, bestWeights, timerVal, timerTotal, onSkipRest, onAddRestTime, variants, onSwitchVariant, onOpenProgress }: {
   day: any; dayIdx: number; logs: Record<number, ExLogs>;
   onConfirm: (exIdx: number, setIdx: number, reps: number | null, mode: "hold" | "tap" | "voice", effort: Effort | null) => void;
   weights: Record<string, number>; onWeightChange: (name: string, weight: number | null) => void;
@@ -1329,6 +1340,7 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, da
   dayHistory: Record<string, number[]>;
   timerVal: number | null; timerTotal: number; onSkipRest: () => void; onAddRestTime: () => void;
   variants: Record<string, string>; onSwitchVariant: (exIdx: number, name: string | null) => void;
+  onOpenProgress: (name: string) => void;
 }) {
   const [current, setCurrent] = useState(0);
   const deckRef = useRef<HTMLDivElement>(null);
@@ -1414,6 +1426,7 @@ function SessionDeck({ day, dayIdx, logs, onConfirm, weights, onWeightChange, da
               onNext={() => goTo(i + 1)}
               activeVariant={variants[`${dayIdx}-${i}`]}
               onSwitchVariant={(name) => onSwitchVariant(i, name)}
+              onOpenProgress={onOpenProgress}
             />
           ))}
         </div>
@@ -1751,24 +1764,22 @@ function CalendarModal({ password, onClose }: { password: string; onClose: () =>
 
 // ─── INSIGHTS (weight progression graph) ─────────────────────────────────────
 
-function InsightsModal({ password, onClose }: { password: string; onClose: () => void }) {
-  const exerciseOptions = DAYS.flatMap((d, dayIdx) =>
-    d.exercises.map((ex, exIdx) => ({ dayIdx, exIdx, name: ex.name, dayLabel: d.label, color: d.color }))
-  );
-  const [selected, setSelected] = useState(exerciseOptions[0]);
+// One exercise's full weight-history line — opened by clicking a LiftCard,
+// either from the full Progress page or straight off a workout session card.
+function LiftDetailModal({ password, name, color, onClose }: { password: string; name: string; color: string; onClose: () => void }) {
   const [points, setPoints] = useState<HistoryPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/progress/history?name=${encodeURIComponent(selected.name)}`, {
+    fetch(`/api/progress/history?name=${encodeURIComponent(name)}`, {
       headers: { "x-app-password": password },
     })
       .then((r) => r.json())
       .then((data) => setPoints(data.points || []))
       .catch(() => setPoints([]))
       .finally(() => setLoading(false));
-  }, [selected, password]);
+  }, [name, password]);
 
   const withWeight = points.filter((p) => p.weight != null);
   const first = withWeight[0]?.weight ?? null;
@@ -1776,33 +1787,17 @@ function InsightsModal({ password, onClose }: { password: string; onClose: () =>
   const delta = first != null && last != null ? Math.round((last - first) * 10) / 10 : null;
 
   return (
-    <div className="scrim">
-      <div className="modal">
+    <div className="scrim" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="head">
-          <div className="title">Progress</div>
+          <div className="title">{name}</div>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
-        <select
-          value={`${selected.dayIdx}-${selected.exIdx}`}
-          onChange={(e) => {
-            const [d, x] = e.target.value.split("-").map(Number);
-            const next = exerciseOptions.find((o) => o.dayIdx === d && o.exIdx === x);
-            if (next) setSelected(next);
-          }}
-          className="picker"
-        >
-          {DAYS.map((d, dayIdx) => (
-            <optgroup key={d.key} label={d.label}>
-              {d.exercises.map((ex, exIdx) => (
-                <option key={exIdx} value={`${dayIdx}-${exIdx}`}>{ex.name}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-
-        {withWeight.length === 0 ? (
-          <div className="empty">{loading ? "Loading…" : "No weight logged for this exercise yet — add one from its weight block on the plan."}</div>
+        {loading ? (
+          <div className="empty">Loading…</div>
+        ) : withWeight.length === 0 ? (
+          <div className="empty">No weight logged for this exercise yet — add one from its weight block on the plan.</div>
         ) : (
           <>
             <div className="stat-row">
@@ -1824,7 +1819,7 @@ function InsightsModal({ password, onClose }: { password: string; onClose: () =>
                     contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid var(--hairline)", background: "var(--surface)", color: "var(--ink)" }}
                     formatter={(value: number) => [`${value} kg`, "Weight"]}
                   />
-                  <Line type="monotone" dataKey="weight" stroke={selected.color} strokeWidth={2.5} dot={{ r: 3, fill: selected.color }} connectNulls />
+                  <Line type="monotone" dataKey="weight" stroke={color} strokeWidth={2.5} dot={{ r: 3, fill: color }} connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1834,10 +1829,9 @@ function InsightsModal({ password, onClose }: { password: string; onClose: () =>
       <style jsx>{`
         .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .modal { background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 22px; max-width: 420px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-        .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .title { font-weight: 700; font-size: 16px; color: var(--ink); }
-        .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-dim); }
-        .picker { width: 100%; height: 42px; border-radius: 10px; border: 1px solid var(--hairline); padding: 0 10px; font-size: 13px; margin-bottom: 16px; background: var(--surface-2); color: var(--ink); box-sizing: border-box; }
+        .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+        .title { font-weight: 700; font-size: 16px; color: var(--ink); line-height: 1.3; }
+        .close-btn { flex-shrink: 0; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-dim); }
         .empty { text-align: center; padding: 36px 10px; color: var(--ink-faint); font-size: 13px; }
         .stat-row { display: flex; gap: 8px; margin-bottom: 16px; }
         .stat { flex: 1; background: var(--surface-2); border-radius: 12px; padding: 10px 8px; text-align: center; }
@@ -1846,6 +1840,143 @@ function InsightsModal({ password, onClose }: { password: string; onClose: () =>
         .stat-num { font-size: 17px; font-weight: 700; color: var(--ink); }
         .stat-lbl { font-size: 9px; color: var(--ink-faint); font-weight: 700; text-transform: uppercase; }
         .chart-wrap { width: 100%; height: 200px; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── LIFT CARD (one exercise's status + sparkline, used in the grid and
+// dropped straight onto a session card) ──────────────────────────────────
+
+type LiftStat = { name: string; points: { date: string; weight: number | null }[]; best: number | null; sessions: number; deltaPct: number | null; status: "good" | "warn" | "crit" | "new" };
+
+function computeLiftStat(name: string, rawPoints: { date: string; weight: number | null }[], best: number | null): LiftStat {
+  const points = rawPoints.filter((p) => p.weight != null);
+  const first = points[0]?.weight ?? null;
+  const last = points[points.length - 1]?.weight ?? null;
+  const deltaPct = first != null && last != null && first !== 0 ? Math.round(((last - first) / first) * 1000) / 10 : null;
+  let status: LiftStat["status"] = "new";
+  if (points.length >= 2 && deltaPct != null) {
+    status = deltaPct <= -15 ? "crit" : deltaPct >= 15 ? "good" : "warn";
+  }
+  return { name, points, best, sessions: points.length, deltaPct, status };
+}
+
+const STATUS_LABEL: Record<LiftStat["status"], string> = { good: "Improving", warn: "Plateaued", crit: "Declining", new: "New" };
+const STATUS_COLOR: Record<LiftStat["status"], string> = { good: "var(--good)", warn: "var(--brass)", crit: "var(--danger)", new: "var(--ink-faint)" };
+
+function LiftCard({ stat, highlighted, onOpen }: { stat: LiftStat; highlighted?: boolean; onOpen: () => void }) {
+  const color = STATUS_COLOR[stat.status];
+  const W = 220, H = 44, pad = 4;
+  const weights = stat.points.map((p) => p.weight as number);
+  const minW = Math.min(...weights), maxW = Math.max(...weights);
+  const range = maxW - minW || 1;
+  const n = weights.length;
+  const xOf = (i: number) => (n <= 1 ? W / 2 : pad + ((W - pad * 2) * i) / (n - 1));
+  const yOf = (v: number) => pad + (H - pad * 2) * (1 - (v - minW) / range);
+  const linePts = weights.map((w, i) => `${xOf(i)},${yOf(w)}`).join(" L ");
+  const areaPts = n > 1 ? `M ${xOf(0)} ${H} L ${linePts} L ${xOf(n - 1)} ${H} Z` : "";
+  const lastX = xOf(n - 1), lastY = n ? yOf(weights[n - 1]) : H / 2;
+  const deltaStr = stat.deltaPct == null ? "—" : stat.deltaPct > 0 ? `+${stat.deltaPct}%` : `${stat.deltaPct}%`;
+
+  return (
+    <button className={`lift-card ${highlighted ? "hl" : ""}`} onClick={onOpen}>
+      <div className="lift-head">
+        <div className="lift-name">{stat.name}</div>
+        <div className="chip" style={{ color, background: `color-mix(in srgb, ${color} 16%, transparent)` }}>{STATUS_LABEL[stat.status]}</div>
+      </div>
+      <div className="lift-meta">{stat.best != null ? <>best <b>{stat.best}kg</b> · </> : null}{stat.sessions} session{stat.sessions === 1 ? "" : "s"} logged{stat.sessions > 0 && stat.sessions <= 2 ? " · thin data" : ""}</div>
+      {n >= 2 ? (
+        <svg viewBox={`0 0 ${W} ${H}`}>
+          <path d={areaPts} fill={color} opacity="0.15" />
+          <path d={`M ${linePts}`} fill="none" stroke={color} strokeWidth="2" />
+          <circle cx={lastX} cy={lastY} r="3.5" fill={color} />
+        </svg>
+      ) : (
+        <div className="lift-empty">{n === 1 ? "Log one more session to see a trend" : "No weight logged yet"}</div>
+      )}
+      {n >= 2 && (
+        <div className="lift-foot"><span>{weights[0]}kg →</span><span style={{ color, fontWeight: 700 }}>{deltaStr}</span></div>
+      )}
+      <style jsx>{`
+        .lift-card { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px 12px; cursor: pointer; touch-action: manipulation; }
+        .lift-card.hl { border-color: var(--brass); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brass) 30%, transparent); }
+        .lift-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
+        .lift-name { font-weight: 700; font-size: 13px; line-height: 1.3; color: var(--ink); }
+        .chip { flex-shrink: 0; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
+        .lift-meta { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 8px; }
+        .lift-meta b { color: var(--ink-dim); }
+        .lift-card svg { display: block; width: 100%; height: 44px; overflow: visible; }
+        .lift-empty { height: 44px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink-faint); background: var(--surface-2); border-radius: 8px; }
+        .lift-foot { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+      `}</style>
+    </button>
+  );
+}
+
+// ─── PROGRESS PAGE (every exercise ever logged, as one grid) ─────────────
+
+function ProgressPage({ password, focusName, onBack }: { password: string; focusName: string | null; onBack: () => void }) {
+  const [stats, setStats] = useState<LiftStat[] | null>(null);
+  const [detail, setDetail] = useState<{ name: string; color: string } | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    fetch(`/api/progress/day-history?names=${ALL_EXERCISE_NAMES.map(encodeURIComponent).join("|")}`, {
+      headers: { "x-app-password": password },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        const byName = data.byName || {};
+        const bestByName = data.bestByName || {};
+        const computed = ALL_EXERCISE_NAMES
+          .map((name) => computeLiftStat(name, byName[name] || [], bestByName[name] ?? null))
+          .filter((s) => s.sessions > 0);
+        const order = { crit: 0, warn: 1, good: 2, new: 3 } as const;
+        computed.sort((a, b) => order[a.status] - order[b.status] || b.sessions - a.sessions);
+        setStats(computed);
+      })
+      .catch(() => setStats([]));
+  }, [password]);
+
+  useEffect(() => {
+    if (!focusName || !stats) return;
+    const el = cardRefs.current[focusName];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focusName, stats]);
+
+  return (
+    <div className="progress-page">
+      <div className="pp-topbar">
+        <button className="back-btn" onClick={onBack} aria-label="Back">‹</button>
+        <div className="pp-title">Progress</div>
+      </div>
+      <div className="pp-body">
+        {stats == null ? (
+          <div className="pp-empty">Loading…</div>
+        ) : stats.length === 0 ? (
+          <div className="pp-empty">No weight logged yet — it'll show up here after your first session.</div>
+        ) : (
+          <div className="pp-grid">
+            {stats.map((s) => (
+              <div key={s.name} ref={(el) => { cardRefs.current[s.name] = el; }}>
+                <LiftCard stat={s} highlighted={s.name === focusName} onOpen={() => setDetail({ name: s.name, color: STATUS_COLOR[s.status] })} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {detail && password && (
+        <LiftDetailModal password={password} name={detail.name} color={detail.color} onClose={() => setDetail(null)} />
+      )}
+      <style jsx>{`
+        .progress-page { min-height: 100vh; background: var(--bg); }
+        .pp-topbar { display: flex; align-items: center; gap: 10px; padding: 16px 20px; position: sticky; top: 0; background: var(--bg); z-index: 5; border-bottom: 1px solid var(--hairline); }
+        .back-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-dim); font-size: 18px; cursor: pointer; }
+        .pp-title { font-size: 17px; font-weight: 800; color: var(--ink); }
+        .pp-body { padding: 18px 20px 60px; }
+        .pp-empty { text-align: center; padding: 60px 20px; color: var(--ink-faint); font-size: 13px; }
+        .pp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
       `}</style>
     </div>
   );
@@ -2407,7 +2538,14 @@ function ErrorToast({ message, onDismiss }: { message: string | null; onDismiss:
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 
 export default function WorkoutApp() {
-  const [view, setView] = useState<"home" | "session" | "cardio" | "mobility">("home");
+  const [view, setView] = useState<"home" | "session" | "cardio" | "mobility" | "progress">("home");
+  const [priorView, setPriorView] = useState<"home" | "session">("home");
+  const [progressFocus, setProgressFocus] = useState<string | null>(null);
+  const openProgress = (focusName: string | null) => {
+    setPriorView(view === "session" ? "session" : "home");
+    setProgressFocus(focusName);
+    setView("progress");
+  };
   const [dayIdx, setDayIdx] = useState(0);
   const [logs, setLogs] = useState<Record<string, Record<number, ExLogs>>>({});
   const [streak, setStreak] = useState({ current: 0, longest: 0 });
@@ -2427,7 +2565,6 @@ export default function WorkoutApp() {
   const [showNotion, setShowNotion] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showExplore, setShowExplore] = useState(false);
-  const [showInsights, setShowInsights] = useState(false);
   const [showCardioInsights, setShowCardioInsights] = useState(false);
   const [showDayPicker, setShowDayPicker] = useState(false);
   const [restFor, setRestFor] = useState<number | null>(null);
@@ -2559,7 +2696,24 @@ export default function WorkoutApp() {
 
   const day = DAYS[dayIdx];
   const dayKey = `${dayIdx}`;
-  const doneSetsForDay: Record<number, ExLogs> = logs[dayKey] || {};
+  const rawLogsForDay: Record<number, ExLogs> = logs[dayKey] || {};
+  // A slot's logged sets carry the exercise they were logged under (set above
+  // in handleConfirm). Switching a slot's variant mid-session must not show
+  // the previous variant's completed pips/PR as if they belonged to the new
+  // one — so only sets logged for the currently active variant count as
+  // "done" here. Sets logged before this field existed have no `exercise`;
+  // treat those as belonging to the originally planned exercise only.
+  const doneSetsForDay: Record<number, ExLogs> = {};
+  day.exercises.forEach((ex, ei) => {
+    const activeName = resolveVariant(variants[`${dayIdx}-${ei}`], ex, day).name;
+    const exLogs = rawLogsForDay[ei] || {};
+    const filtered: ExLogs = {};
+    for (const [setIdx, log] of Object.entries(exLogs)) {
+      const loggedFor = log.exercise ?? ex.name;
+      if (loggedFor === activeName) filtered[Number(setIdx)] = log;
+    }
+    doneSetsForDay[ei] = filtered;
+  });
   const sessionDone = day.exercises.every((ex, ei) => Object.keys(doneSetsForDay[ei] || {}).length >= ex.sets);
 
   // Auto-close the rest sheet once its countdown reaches zero.
@@ -2636,7 +2790,7 @@ export default function WorkoutApp() {
     setLogs((prev) => {
       const dayLogs = prev[dk] || {};
       const exLogs = dayLogs[exIdx] || {};
-      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, weight, mode, effort } } } };
+      return { ...prev, [dk]: { ...dayLogs, [exIdx]: { ...exLogs, [setIdx]: { reps, weight, mode, effort, exercise: activeName } } } };
     });
     const restSec = day.exercises[exIdx].rest;
     if (restSec > 0) {
@@ -2703,6 +2857,16 @@ export default function WorkoutApp() {
     );
   }
 
+  if (view === "progress") {
+    return (
+      <div className="app-root">
+        <ThemeStyles />
+        <ErrorToast message={toast} onDismiss={() => setToast(null)} />
+        {password && <ProgressPage password={password} focusName={progressFocus} onBack={() => setView(priorView)} />}
+      </div>
+    );
+  }
+
   if (view === "home") {
     return (
       <div className="app-root">
@@ -2716,7 +2880,7 @@ export default function WorkoutApp() {
           onStartCardio={() => setView("cardio")}
           onStartMobility={() => setView("mobility")}
           onOpenCalendar={() => setShowCalendar(true)}
-          onOpenInsights={() => setShowInsights(true)}
+          onOpenInsights={() => openProgress(null)}
           onOpenCardioInsights={() => setShowCardioInsights(true)}
           onOpenNotion={() => setShowNotion(true)}
           onOpenExplore={() => setShowExplore(true)}
@@ -2741,7 +2905,6 @@ export default function WorkoutApp() {
         )}
         {showNotion && <NotionModal day={day} onClose={() => setShowNotion(false)} />}
         {showCalendar && password && <CalendarModal password={password} onClose={() => setShowCalendar(false)} />}
-        {showInsights && password && <InsightsModal password={password} onClose={() => setShowInsights(false)} />}
         {showCardioInsights && password && <CardioInsightsModal password={password} onClose={() => setShowCardioInsights(false)} />}
         {showExplore && <ExploreModal onClose={() => setShowExplore(false)} />}
         <style jsx>{`
@@ -2776,7 +2939,7 @@ export default function WorkoutApp() {
               ⏳ {pendingSync}
             </span>
           )}
-          <button className="icon-btn small" onClick={() => setShowInsights(true)} aria-label="Progress graph">📈</button>
+          <button className="icon-btn small" onClick={() => openProgress(null)} aria-label="Progress graph">📈</button>
           <button className="icon-btn small" onClick={() => setShowNotion(true)} aria-label="Export to Notion">📝</button>
           <button className="icon-btn small streak" onClick={() => setShowCalendar(true)} aria-label="Calendar">
             {streak.current > 0 ? `🔥 ${streak.current}` : "📅"}
@@ -2799,6 +2962,7 @@ export default function WorkoutApp() {
         onAddRestTime={() => { if (restFor != null) addTime(`${restFor}`, 15); setRestTotal((t) => t + 15); }}
         variants={variants}
         onSwitchVariant={switchVariant}
+        onOpenProgress={openProgress}
       />
 
       {sessionDone && (
@@ -2833,7 +2997,6 @@ export default function WorkoutApp() {
 
       {showNotion && <NotionModal day={day} onClose={() => setShowNotion(false)} />}
       {showCalendar && password && <CalendarModal password={password} onClose={() => setShowCalendar(false)} />}
-      {showInsights && password && <InsightsModal password={password} onClose={() => setShowInsights(false)} />}
 
       <style jsx>{`
         .shell { display: flex; flex-direction: column; height: 100dvh; background: var(--bg); overflow: hidden; }

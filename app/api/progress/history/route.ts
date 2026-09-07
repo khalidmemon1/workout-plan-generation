@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getDb } from "@/lib/mongodb"
 import { requireAuth } from "@/lib/auth"
+import { buildHistoryForName } from "@/lib/exerciseHistory.mjs"
 import type { DayDoc } from "@/lib/types"
 
 // One point per calendar date this exercise was touched: heaviest weight
@@ -25,23 +26,7 @@ export async function GET(req: NextRequest) {
     .sort({ _id: 1 })
     .toArray()
 
-  const points = docs
-    .map((doc) => {
-      const sets = Object.values(doc.templates ?? {})
-        .flatMap((exercises) => Object.values(exercises))
-        .flatMap((setsObj) => Object.values(setsObj))
-        .filter((s) => s.exercise === name)
-      if (sets.length === 0) return null
-      const weights = sets.map((s) => s.weight).filter((w): w is number => w != null)
-      const reps = sets.reduce((a, s) => a + (s.reps ?? 0), 0)
-      return {
-        date: doc._id,
-        weight: weights.length ? Math.max(...weights) : null,
-        sets: sets.length,
-        reps,
-      }
-    })
-    .filter((p): p is NonNullable<typeof p> => p != null)
+  const points = buildHistoryForName(docs, name)
 
   return NextResponse.json({ points })
 }
